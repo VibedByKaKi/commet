@@ -193,9 +193,13 @@ jobs:
           cd $PROJECT_PATH
           flutter build linux --release --dart-define PLATFORM=linux
 
-      - name: Run App
+      - name: Bundle libmpv and runtime deps
         run: |
-          ldd $PROJECT_PATH/build/linux/x64/release/bundle/commet
+          cd $PROJECT_PATH
+          bash scripts/bundle_linux_runtime_libs.sh build/linux/x64/release/bundle
+          ldd build/linux/x64/release/bundle/commet.bin | tee /tmp/commet-ldd.txt
+          grep -q 'libmpv.so.2 => .*/bundle/lib/libmpv.so.2' /tmp/commet-ldd.txt \
+            || (echo "libmpv was not resolved from the bundle lib dir" >&2; exit 1)
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7

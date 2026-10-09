@@ -28,6 +28,8 @@ Pushes to `dev` do not build. Tag a commit on `dev` when you want the full matri
 
 APKs upload as single files (not wrapped in a zip). Windows, Linux, and Web builds are directories, so those stay zipped.
 
+Linux artifacts vendor `libmpv` (and related runtime libs) into `lib/` and launch through a small wrapper so the binary does not need a system `libmpv2` package.
+
 ### macOS artifacts
 
 Tag builds upload `commet-macos-<tag>.zip` (for example `commet-macos-0.1.0-dev.0.zip`). Unzipping yields a `commet.app` bundle. Builds are ad-hoc signed; after downloading, clear Gatekeeper quarantine before opening:
