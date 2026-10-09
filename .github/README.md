@@ -21,9 +21,9 @@ The **build** workflow:
 
 | Trigger | Platforms |
 | --- | --- |
-| Tag created | Windows, Linux, Android, Android (Google Services), Web |
+| Tag created | Windows, macOS, Linux, Android, Android (Google Services), Web |
 | Push to a non-`dev` branch, PR, merge queue | Linux, Android |
 
 Pushes to `dev` do not build. Tag a commit on `dev` when you want the full matrix.
 
-APKs upload as single files (not wrapped in a zip). Windows, Linux, and Web builds are directories, so those stay zipped.
+APKs upload as single files (not wrapped in a zip). Windows, macOS, Linux, and Web builds are directories, so those stay zipped.
