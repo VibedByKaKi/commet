@@ -75,6 +75,11 @@ jobs:
           cd $PROJECT_PATH
           dart run scripts/codegen.dart
 
+      - name: Align CocoaPods WebRTC-SDK pins
+        run: |
+          cd $PROJECT_PATH
+          bash scripts/align_macos_webrtc_pods.sh
+
       - name: Build macOS App
         run: |
           cd $PROJECT_PATH
