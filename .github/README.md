@@ -14,3 +14,14 @@ The upstream project README is still in [README.md](../README.md) at the reposit
 | `dev` | Default branch for fork-only enhancements |
 
 Feature work branches from `dev` and merges back into `dev`.
+
+## CI
+
+The **build** workflow runs on every push and PR.
+
+| Branch | Platforms | Artifacts |
+| --- | --- | --- |
+| `dev` | Windows, Linux, Android, Android (Google Services), Web | Uploaded from Actions |
+| other | Linux, Android | Uploaded from Actions |
+
+APKs upload as single files (not wrapped in a zip). Windows, Linux, and Web builds are directories, so those stay zipped.

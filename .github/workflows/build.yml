@@ -2,14 +2,21 @@
 name: build
 
 on:
+  push:
   pull_request:
   merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PROJECT_PATH: commet
 
 jobs:
   build-windows:
+    if: github.ref == 'refs/heads/dev'
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -36,6 +43,13 @@ jobs:
         run: |
           cd .\commet
           flutter build windows --release --dart-define PLATFORM=windows
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: commet-windows-${{ github.run_number }}
+          path: commet/build/windows/x64/runner/Release
+          retention-days: 14
 
   build-android:
     runs-on: ubuntu-latest
@@ -99,7 +113,22 @@ jobs:
           cd $PROJECT_PATH
           flutter build apk --debug --dart-define PLATFORM=android
 
+      - name: Prepare APK for upload
+        id: prepare
+        run: |
+          DEST="commet-android-debug-${{ github.run_number }}.apk"
+          cp "$PROJECT_PATH/build/app/outputs/flutter-apk/app-debug.apk" "$DEST"
+          echo "apk_filename=${DEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ steps.prepare.outputs.apk_filename }}
+          archive: false
+          retention-days: 14
+
   build-android-google-services:
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       # we were having issues running out of disk space on workers, so...
@@ -162,6 +191,20 @@ jobs:
           cd $PROJECT_PATH
           flutter build apk --debug --dart-define ENABLE_GOOGLE_SERVICES=true --dart-define PLATFORM=android
 
+      - name: Prepare APK for upload
+        id: prepare
+        run: |
+          DEST="commet-android-google-services-debug-${{ github.run_number }}.apk"
+          cp "$PROJECT_PATH/build/app/outputs/flutter-apk/app-debug.apk" "$DEST"
+          echo "apk_filename=${DEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: ${{ steps.prepare.outputs.apk_filename }}
+          archive: false
+          retention-days: 14
+
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -195,7 +238,15 @@ jobs:
         run: |
           ldd $PROJECT_PATH/build/linux/x64/release/bundle/commet
 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: commet-linux-${{ github.run_number }}
+          path: commet/build/linux/x64/release/bundle
+          retention-days: 14
+
   build-web:
+    if: github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -223,3 +274,10 @@ jobs:
         run: |
           cd $PROJECT_PATH
           flutter build web --release --dart-define PLATFORM=web
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: commet-web-${{ github.run_number }}
+          path: commet/build/web
+          retention-days: 14
