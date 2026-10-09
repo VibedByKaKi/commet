@@ -85,11 +85,22 @@ jobs:
           cd $PROJECT_PATH
           flutter build macos --release --dart-define PLATFORM=macos
 
+      - name: Sign and package .app
+        run: |
+          set -euo pipefail
+          APP="$PROJECT_PATH/build/macos/Build/Products/Release/commet.app"
+          # Ad-hoc sign the whole bundle so embedded frameworks (e.g. Ass) load.
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict "$APP"
+          mkdir -p dist
+          # KeepParent so the zip's top-level folder is commet.app, not the artifact name.
+          ditto -c -k --keepParent "$APP" "dist/commet-macos-${{ github.ref_name }}.zip"
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: commet-macos-${{ github.run_number }}
-          path: commet/build/macos/Build/Products/Release/commet.app
+          path: dist/commet-macos-${{ github.ref_name }}.zip
+          archive: false
           retention-days: 14
 
   build-android:
