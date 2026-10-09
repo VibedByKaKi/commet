@@ -26,7 +26,7 @@ The **build** workflow:
 
 Pushes to `dev` do not build. Tag a commit on `dev` when you want the full matrix.
 
-APKs upload as single files (not wrapped in a zip). Windows, Linux, and Web builds are directories, so those stay zipped. Numbers in those artifact names (for example `commet-linux-7`) are the GitHub Actions `run_number` for that workflow run.
+APKs upload as single files (not wrapped in a zip). Windows, Linux, and Web builds are directories, so those stay zipped.
 
 ### macOS artifacts
 
