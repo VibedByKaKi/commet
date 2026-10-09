@@ -15,11 +15,21 @@ import re
 import sys
 import urllib.parse
 
-cfg_path = pathlib.Path(".dart_tool/package_config.json")
-if not cfg_path.is_file():
-    print("error: .dart_tool/package_config.json missing; run flutter pub get first", file=sys.stderr)
-    sys.exit(1)
+app_root = pathlib.Path(".").resolve()
 
+
+def find_package_config(start: pathlib.Path) -> pathlib.Path:
+    for directory in [start, *start.parents]:
+        candidate = directory / ".dart_tool" / "package_config.json"
+        if candidate.is_file():
+            return candidate
+    raise FileNotFoundError(
+        "package_config.json not found; run flutter pub get from the workspace first"
+    )
+
+
+cfg_path = find_package_config(app_root)
+print(f"Using package config: {cfg_path}")
 cfg = json.loads(cfg_path.read_text())
 cfg_dir = cfg_path.parent
 old = "WebRTC-SDK', '144.7559.01'"
@@ -64,7 +74,6 @@ if patched == 0 and any(old in p.read_text() for p in podspecs):
     sys.exit(1)
 
 if patched == 0:
-    # Confirm every podspec already matches flutter_webrtc.
     for podspec in podspecs:
         pins = re.findall(r"WebRTC-SDK',\s*'([^']+)'", podspec.read_text())
         if any(pin != "144.7559.04" for pin in pins):
