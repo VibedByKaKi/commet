@@ -28,7 +28,7 @@ is_seed_lib() {
 is_host_provided() {
   case "$1" in
     linux-vdso.so.*|ld-linux*.so.*|libc.so.*|libm.so.*|libdl.so.*|libpthread.so.*|librt.so.*|libresolv.so.*|libutil.so.*) return 0 ;;
-    libgcc_s.so.*|libstdc++.so.*|libgomp.so.*) return 0 ;;
+    libgcc_s.so.*|libstdc++.so.*|libgomp.so.*|libatomic.so.*) return 0 ;;
     libgtk-*.so.*|libgdk-*.so.*|libglib-*.so.*|libgobject-*.so.*|libgio-*.so.*|libgmodule-*.so.*) return 0 ;;
     libpango*.so.*|libcairo*.so.*|libatk*.so.*|libharfbuzz.so.*|libgdk_pixbuf*.so.*|libepoxy.so.*) return 0 ;;
     libfontconfig.so.*|libfreetype.so.*|libfribidi.so.*|libthai.so.*|libdatrie.so.*|libpixman*.so.*|libgraphite2.so.*) return 0 ;;
@@ -45,6 +45,7 @@ is_host_provided() {
 }
 
 declare -A SEEN=()
+bundled_bases=()
 queue=()
 
 enqueue_libs_from() {
@@ -74,6 +75,7 @@ while [[ "$i" -lt "${#queue[@]}" ]]; do
   [[ -n "${SEEN[$base]:-}" ]] && continue
   SEEN[$base]=1
   cp -L "$lib" "$LIBDIR/$base"
+  bundled_bases+=("$base")
   echo "Bundled $base"
   enqueue_libs_from "$LIBDIR/$base" deps
 done
@@ -82,15 +84,18 @@ if [[ ! -f "$LIBDIR/libmpv.so.2" ]]; then
   echo "error: failed to bundle libmpv.so.2" >&2
   exit 1
 fi
+if [[ ! -f "$LIBDIR/libXpresent.so.1" ]]; then
+  echo "error: failed to bundle libXpresent.so.1 (required by libmpv)" >&2
+  exit 1
+fi
 
-# Fail if any vendored lib still needs something that is neither host-provided
-# nor present in the bundle (this is what caught libXpresent before).
+# Only verify libs we vendored — not Flutter plugin .so files already in lib/.
 missing=0
-for lib in "$LIBDIR"/*; do
-  [[ -f "$lib" ]] || continue
+for base in "${bundled_bases[@]}"; do
+  lib="$LIBDIR/$base"
   while read -r line; do
-    if [[ "$line" =~ "not found" ]]; then
-      echo "error: unresolved dependency for $(basename "$lib"): $line" >&2
+    if [[ "$line" == *"not found"* ]]; then
+      echo "error: unresolved dependency for $base: $line" >&2
       missing=1
       continue
     fi
@@ -99,7 +104,7 @@ for lib in "$LIBDIR"/*; do
     depbase="$(basename "$dep")"
     is_host_provided "$depbase" && continue
     if [[ ! -f "$LIBDIR/$depbase" ]]; then
-      echo "error: $(basename "$lib") needs $depbase but it was not bundled" >&2
+      echo "error: $base needs $depbase but it was not bundled" >&2
       missing=1
     fi
   done < <(ldd "$lib")
@@ -123,4 +128,4 @@ EOF
 chmod +x "$BIN"
 
 echo "Wrapped launcher at $BIN"
-ls -1 "$LIBDIR" | wc -l | xargs -I{} echo "Bundled {} libraries"
+echo "Bundled ${#bundled_bases[@]} libraries"
