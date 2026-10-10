@@ -23,6 +23,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Artifact version
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            v="${GITHUB_REF_NAME}"
+          else
+            v="${GITHUB_SHA:0:7}"
+          fi
+          echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
         with:
@@ -47,7 +58,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: commet-windows
+          name: commet-windows-${{ steps.meta.outputs.version }}
           path: commet/build/windows/x64/runner/Release
           retention-days: 14
 
@@ -57,6 +68,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Artifact version
+        id: meta
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            v="${GITHUB_REF_NAME}"
+          else
+            v="${GITHUB_SHA:0:7}"
+          fi
+          echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -102,12 +123,12 @@ jobs:
           codesign --verify --deep --strict "$APP"
           mkdir -p dist
           # KeepParent so the zip's top-level folder is commet.app, not the artifact name.
-          ditto -c -k --keepParent "$APP" "dist/commet-macos-${{ github.ref_name }}.zip"
+          ditto -c -k --keepParent "$APP" "dist/commet-macos-${{ steps.meta.outputs.version }}.zip"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          path: dist/commet-macos-${{ github.ref_name }}.zip
+          path: dist/commet-macos-${{ steps.meta.outputs.version }}.zip
           archive: false
           retention-days: 14
 
@@ -125,6 +146,16 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Artifact version
+        id: meta
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            v="${GITHUB_REF_NAME}"
+          else
+            v="${GITHUB_SHA:0:7}"
+          fi
+          echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -153,7 +184,7 @@ jobs:
       - name: Prepare APK for upload
         id: prepare
         run: |
-          DEST="commet-android-debug.apk"
+          DEST="commet-android-debug-${{ steps.meta.outputs.version }}.apk"
           cp "$PROJECT_PATH/build/app/outputs/flutter-apk/app-debug.apk" "$DEST"
           echo "apk_filename=${DEST}" >> "$GITHUB_OUTPUT"
 
@@ -170,6 +201,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Artifact version
+        id: meta
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            v="${GITHUB_REF_NAME}"
+          else
+            v="${GITHUB_SHA:0:7}"
+          fi
+          echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -198,6 +239,7 @@ jobs:
           cd $PROJECT_PATH
           bash scripts/bundle_linux_runtime_libs.sh build/linux/x64/release/bundle
           test -f build/linux/x64/release/bundle/lib/libmpv.so.2
+          test -f build/linux/x64/release/bundle/lib/libXpresent.so.1
           LD_LIBRARY_PATH="$PWD/build/linux/x64/release/bundle/lib" \
             ldd build/linux/x64/release/bundle/commet.bin | tee /tmp/commet-ldd.txt
           grep -q 'libmpv.so.2 => .*/bundle/lib/libmpv.so.2' /tmp/commet-ldd.txt \
@@ -206,7 +248,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: commet-linux
+          name: commet-linux-${{ steps.meta.outputs.version }}
           path: commet/build/linux/x64/release/bundle
           retention-days: 14
 
@@ -216,6 +258,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Artifact version
+        id: meta
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            v="${GITHUB_REF_NAME}"
+          else
+            v="${GITHUB_SHA:0:7}"
+          fi
+          echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -237,6 +289,6 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: commet-web
+          name: commet-web-${{ steps.meta.outputs.version }}
           path: commet/build/web
           retention-days: 14
