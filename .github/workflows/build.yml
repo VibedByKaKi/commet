@@ -1,4 +1,3 @@
-
 name: build
 
 on:
@@ -39,6 +38,10 @@ jobs:
             v="${GITHUB_SHA:0:7}"
           fi
           echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=${v}" >> "$GITHUB_OUTPUT"
+          echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
+          echo "build_detail=ci" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -59,7 +62,12 @@ jobs:
       - name: Build Windows App
         run: |
           cd .\commet
-          flutter build windows --release --dart-define PLATFORM=windows
+          flutter build windows --release `
+            --dart-define PLATFORM=windows `
+            --dart-define VERSION_TAG=${{ steps.meta.outputs.version_tag }} `
+            --dart-define GIT_HASH=${{ steps.meta.outputs.git_hash }} `
+            --dart-define BUILD_DATE=${{ steps.meta.outputs.build_date }} `
+            --dart-define BUILD_DETAIL=${{ steps.meta.outputs.build_detail }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
@@ -84,6 +92,10 @@ jobs:
             v="${GITHUB_SHA:0:7}"
           fi
           echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=${v}" >> "$GITHUB_OUTPUT"
+          echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
+          echo "build_detail=ci" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -118,7 +130,12 @@ jobs:
       - name: Build macOS App
         run: |
           cd $PROJECT_PATH
-          flutter build macos --release --dart-define PLATFORM=macos
+          flutter build macos --release \
+            --dart-define PLATFORM=macos \
+            --dart-define VERSION_TAG=${{ steps.meta.outputs.version_tag }} \
+            --dart-define GIT_HASH=${{ steps.meta.outputs.git_hash }} \
+            --dart-define BUILD_DATE=${{ steps.meta.outputs.build_date }} \
+            --dart-define BUILD_DETAIL=${{ steps.meta.outputs.build_detail }}
 
       - name: Sign and package .app
         run: |
@@ -162,6 +179,10 @@ jobs:
             v="${GITHUB_SHA:0:7}"
           fi
           echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=${v}" >> "$GITHUB_OUTPUT"
+          echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
+          echo "build_detail=ci" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -185,7 +206,12 @@ jobs:
       - name: Build APK
         run: |
           cd $PROJECT_PATH
-          flutter build apk --debug --dart-define PLATFORM=android
+          flutter build apk --debug \
+            --dart-define PLATFORM=android \
+            --dart-define VERSION_TAG=${{ steps.meta.outputs.version_tag }} \
+            --dart-define GIT_HASH=${{ steps.meta.outputs.git_hash }} \
+            --dart-define BUILD_DATE=${{ steps.meta.outputs.build_date }} \
+            --dart-define BUILD_DETAIL=${{ steps.meta.outputs.build_detail }}
 
       - name: Prepare APK for upload
         id: prepare
@@ -217,6 +243,10 @@ jobs:
             v="${GITHUB_SHA:0:7}"
           fi
           echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=${v}" >> "$GITHUB_OUTPUT"
+          echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
+          echo "build_detail=ci" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -238,7 +268,12 @@ jobs:
       - name: Build Linux
         run: |
           cd $PROJECT_PATH
-          flutter build linux --release --dart-define PLATFORM=linux
+          flutter build linux --release \
+            --dart-define PLATFORM=linux \
+            --dart-define VERSION_TAG=${{ steps.meta.outputs.version_tag }} \
+            --dart-define GIT_HASH=${{ steps.meta.outputs.git_hash }} \
+            --dart-define BUILD_DATE=${{ steps.meta.outputs.build_date }} \
+            --dart-define BUILD_DETAIL=${{ steps.meta.outputs.build_detail }}
 
       - name: Bundle libmpv and runtime deps
         run: |
@@ -274,6 +309,10 @@ jobs:
             v="${GITHUB_SHA:0:7}"
           fi
           echo "version=${v//\//-}" >> "$GITHUB_OUTPUT"
+          echo "version_tag=${v}" >> "$GITHUB_OUTPUT"
+          echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
+          echo "build_detail=ci" >> "$GITHUB_OUTPUT"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -290,7 +329,12 @@ jobs:
       - name: Build Web
         run: |
           cd $PROJECT_PATH
-          flutter build web --release --dart-define PLATFORM=web
+          flutter build web --release \
+            --dart-define PLATFORM=web \
+            --dart-define VERSION_TAG=${{ steps.meta.outputs.version_tag }} \
+            --dart-define GIT_HASH=${{ steps.meta.outputs.git_hash }} \
+            --dart-define BUILD_DATE=${{ steps.meta.outputs.build_date }} \
+            --dart-define BUILD_DETAIL=${{ steps.meta.outputs.build_detail }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
