@@ -67,6 +67,9 @@ ClientManager? clientManager;
 
 bool isHeadless = false;
 
+/// flutter_rust_bridge may only be initialized once per process.
+bool rustLibInitialized = false;
+
 Future<void>? loading;
 
 List<String> commandLineArgs = [];
@@ -208,8 +211,10 @@ Future<void> initNecessary() async {
   await preferences.init();
   await initDatabaseServer();
 
-  if (PlatformUtils.isWindows || PlatformUtils.isLinux) {
+  if ((PlatformUtils.isWindows || PlatformUtils.isLinux) &&
+      !rustLibInitialized) {
     await RustLib.init();
+    rustLibInitialized = true;
   }
 
   fileCache = FileCache.getFileCacheInstance();
@@ -225,7 +230,11 @@ Future<void> initNecessary() async {
   Diagnostics.setPostInit();
 
   shortcutsManager.init();
-  NotificationManager.init();
+  try {
+    await NotificationManager.init();
+  } catch (e, s) {
+    Log.w("NotificationManager.init failed (continuing): $e\n$s");
+  }
 
   NeedsPostLoginInit.doPostLoginInit();
 }
@@ -237,22 +246,27 @@ Future<void> initGuiRequirements() async {
   MediaKit.ensureInitialized();
 
   var locale = PlatformDispatcher.instance.locale;
+  final languageCode =
+      locale.languageCode.isEmpty ? 'en' : locale.languageCode;
 
-  Future.wait([
+  await Future.wait([
     UnicodeEmojis.load(),
     if (!preferences.debugTranslations.value)
-      initializeMessages(locale.languageCode),
+      initializeMessages(languageCode).then((ok) async {
+        if (!ok && languageCode != 'en') {
+          await initializeMessages('en');
+        }
+      }),
     if (preferences.debugTranslations.value) initializeMessagesDebug(),
-    initializeDateFormatting(locale.languageCode),
+    initializeDateFormatting(languageCode),
   ]);
 
   tiamat.getAppScale = () {
     return preferences.appScale.value;
   };
 
-  Intl.defaultLocale = locale.languageCode;
+  Intl.defaultLocale = languageCode;
 }
-
 /// Initializes gui requirements and launches the gui
 Future<void> startGui() async {
   String? initialRoomId;

@@ -115,16 +115,39 @@ class LinuxNotifier implements Notifier {
 
   @override
   Future<void> init() async {
-    flutterLocalNotificationsPlugin = LinuxFlutterLocalNotificationsPlugin();
+    // CI / headless Linux often has no org.freedesktop.Notifications bus name.
+    // Fall back to empty capabilities so the app can still start.
+    const fallbackCapabilities = LinuxServerCapabilities(
+      otherCapabilities: <String>{},
+      body: true,
+      bodyHyperlinks: false,
+      bodyImages: false,
+      bodyMarkup: false,
+      iconMulti: false,
+      iconStatic: true,
+      persistence: false,
+      sound: false,
+      actions: false,
+      actionIcons: false,
+    );
 
-    const LinuxInitializationSettings initializationSettingsLinux =
-        LinuxInitializationSettings(defaultActionName: 'Open notification');
+    try {
+      flutterLocalNotificationsPlugin = LinuxFlutterLocalNotificationsPlugin();
 
-    await flutterLocalNotificationsPlugin?.initialize(
-        initializationSettingsLinux,
-        onDidReceiveNotificationResponse: notificationResponse);
+      const LinuxInitializationSettings initializationSettingsLinux =
+          LinuxInitializationSettings(defaultActionName: 'Open notification');
 
-    capabilities = await flutterLocalNotificationsPlugin!.getCapabilities();
+      await flutterLocalNotificationsPlugin?.initialize(
+          initializationSettingsLinux,
+          onDidReceiveNotificationResponse: notificationResponse);
+
+      capabilities =
+          await flutterLocalNotificationsPlugin!.getCapabilities();
+    } catch (e, s) {
+      Log.w("Linux notification daemon unavailable: $e\n$s");
+      capabilities = fallbackCapabilities;
+      flutterLocalNotificationsPlugin = null;
+    }
 
     clientManager!.directMessages.highlightedRoomsList.onListUpdated
         .listen((_) => updateBadgeCount());
@@ -137,7 +160,11 @@ class LinuxNotifier implements Notifier {
     if (preferences.showNotificationBadgesInTaskbar.value == true) {
       var counts = NotificationUtils.getNotificationCounts();
       var count = counts.$2;
-      service.update(countVisible: count > 0, count: count);
+      try {
+        service.update(countVisible: count > 0, count: count);
+      } catch (e, s) {
+        Log.w("Launcher badge update failed: $e\n$s");
+      }
     }
   }
 
@@ -304,7 +331,11 @@ class LinuxNotifier implements Notifier {
 
   @override
   Future<void> disableBadges() async {
-    service.update(countVisible: false, count: 0);
+    try {
+      service.update(countVisible: false, count: 0);
+    } catch (e, s) {
+      Log.w("Launcher badge clear failed: $e\n$s");
+    }
   }
 
   @override
