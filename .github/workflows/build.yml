@@ -66,21 +66,27 @@ jobs:
           cd $PROJECT_PATH
           dart run scripts/codegen.dart
 
-      - name: Package generated sources
+      # Stage a directory (not a lone file with archive:false) so the artifact
+      # name stays `codegen` and download-artifact can find it.
+      - name: Stage generated sources
         run: |
           set -euo pipefail
+          STAGE="$GITHUB_WORKSPACE/codegen-out"
+          mkdir -p "$STAGE"
+          cp -a "$PROJECT_PATH/lib/generated" "$STAGE/generated"
           cd "$PROJECT_PATH"
-          mapfile -t gfiles < <(find . -name '*.g.dart' -print)
-          tar czf "$GITHUB_WORKSPACE/codegen-outputs.tar.gz" lib/generated "${gfiles[@]}"
-          ls -lh "$GITHUB_WORKSPACE/codegen-outputs.tar.gz"
+          find . -name '*.g.dart' -print0 | while IFS= read -r -d '' f; do
+            mkdir -p "$STAGE/$(dirname "$f")"
+            cp -a "$f" "$STAGE/$f"
+          done
+          find "$STAGE" | head -n 50
 
       - name: Upload generated sources
         uses: actions/upload-artifact@v7
         with:
           name: codegen
-          path: codegen-outputs.tar.gz
+          path: codegen-out/
           retention-days: 1
-          archive: false
 
   build-windows:
     # Full matrix only when a tag is created. Pushes to `dev` skip all jobs.
@@ -128,11 +134,20 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: codegen
-          path: .
+          path: codegen-out
 
       - name: Restore generated sources
         shell: bash
-        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+        run: |
+          set -euo pipefail
+          cp -a codegen-out/generated "$PROJECT_PATH/lib/generated"
+          if compgen -G 'codegen-out/**/*.g.dart' > /dev/null; then
+            cd codegen-out
+            find . -name '*.g.dart' -print0 | while IFS= read -r -d '' f; do
+              mkdir -p "$GITHUB_WORKSPACE/$PROJECT_PATH/$(dirname "$f")"
+              cp -a "$f" "$GITHUB_WORKSPACE/$PROJECT_PATH/$f"
+            done
+          fi
 
       - name: Pub get
         run: |
@@ -211,10 +226,17 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: codegen
-          path: .
+          path: codegen-out
 
       - name: Restore generated sources
-        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+        run: |
+          set -euo pipefail
+          cp -a codegen-out/generated "$PROJECT_PATH/lib/generated"
+          cd codegen-out
+          find . -name '*.g.dart' -print0 | while IFS= read -r -d '' f; do
+            mkdir -p "$GITHUB_WORKSPACE/$PROJECT_PATH/$(dirname "$f")"
+            cp -a "$f" "$GITHUB_WORKSPACE/$PROJECT_PATH/$f"
+          done
 
       - name: Pub get
         run: |
@@ -320,10 +342,17 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: codegen
-          path: .
+          path: codegen-out
 
       - name: Restore generated sources
-        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+        run: |
+          set -euo pipefail
+          cp -a codegen-out/generated "$PROJECT_PATH/lib/generated"
+          cd codegen-out
+          find . -name '*.g.dart' -print0 | while IFS= read -r -d '' f; do
+            mkdir -p "$GITHUB_WORKSPACE/$PROJECT_PATH/$(dirname "$f")"
+            cp -a "$f" "$GITHUB_WORKSPACE/$PROJECT_PATH/$f"
+          done
 
       - name: Pub get
         run: |
@@ -402,10 +431,17 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: codegen
-          path: .
+          path: codegen-out
 
       - name: Restore generated sources
-        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+        run: |
+          set -euo pipefail
+          cp -a codegen-out/generated "$PROJECT_PATH/lib/generated"
+          cd codegen-out
+          find . -name '*.g.dart' -print0 | while IFS= read -r -d '' f; do
+            mkdir -p "$GITHUB_WORKSPACE/$PROJECT_PATH/$(dirname "$f")"
+            cp -a "$f" "$GITHUB_WORKSPACE/$PROJECT_PATH/$f"
+          done
 
       - name: Pub get
         run: |
@@ -481,10 +517,17 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: codegen
-          path: .
+          path: codegen-out
 
       - name: Restore generated sources
-        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+        run: |
+          set -euo pipefail
+          cp -a codegen-out/generated "$PROJECT_PATH/lib/generated"
+          cd codegen-out
+          find . -name '*.g.dart' -print0 | while IFS= read -r -d '' f; do
+            mkdir -p "$GITHUB_WORKSPACE/$PROJECT_PATH/$(dirname "$f")"
+            cp -a "$f" "$GITHUB_WORKSPACE/$PROJECT_PATH/$f"
+          done
 
       - name: Pub get
         run: |
