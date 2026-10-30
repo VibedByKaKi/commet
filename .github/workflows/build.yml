@@ -18,6 +18,8 @@ concurrency:
 
 env:
   PROJECT_PATH: commet
+  # Stable path so Pub cache works the same on Linux/macOS/Windows runners.
+  PUB_CACHE: ${{ github.workspace }}/.pub-cache
 
 jobs:
   build-windows:
@@ -42,6 +44,14 @@ jobs:
           echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
           echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
           echo "build_detail=ci" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Pub packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -96,6 +106,14 @@ jobs:
           echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
           echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
           echo "build_detail=ci" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Pub packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
@@ -160,11 +178,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Free disk without wiping hostedtoolcache (that forces a full Flutter reinstall).
+      # Skip docker prune — runners rarely have useful images here and it costs ~20–40s.
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/.ghcup /usr/local/julia* \
             /usr/local/share/chromium /opt/microsoft /opt/google /opt/az || true
-          docker system prune -af || true
           df -h
 
       - name: Checkout
@@ -184,6 +202,14 @@ jobs:
           echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
           echo "build_detail=ci" >> "$GITHUB_OUTPUT"
 
+      - name: Cache Pub packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
         with:
@@ -196,17 +222,28 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          cache: gradle
+
+      # Full ~/.gradle cache was ~4GB and cost ~1–1.5m on every Post Setup Java save.
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: gradle-modules-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
+          restore-keys: |
+            gradle-modules-${{ runner.os }}-
 
       - name: Code Generation
         run: |
           cd $PROJECT_PATH
           dart run scripts/codegen.dart
 
+      # arm64-only: fat multi-ABI APKs dominated the ~10m Build APK step.
       - name: Build APK
         run: |
           cd $PROJECT_PATH
-          flutter build apk --debug \
+          flutter build apk --debug --target-platform=android-arm64 \
             --dart-define PLATFORM=android \
             --dart-define VERSION_TAG=${{ steps.meta.outputs.version_tag }} \
             --dart-define GIT_HASH=${{ steps.meta.outputs.git_hash }} \
@@ -216,7 +253,7 @@ jobs:
       - name: Prepare APK for upload
         id: prepare
         run: |
-          DEST="commet-android-debug-${{ steps.meta.outputs.version }}.apk"
+          DEST="commet-android-debug-arm64-${{ steps.meta.outputs.version }}.apk"
           cp "$PROJECT_PATH/build/app/outputs/flutter-apk/app-debug.apk" "$DEST"
           echo "apk_filename=${DEST}" >> "$GITHUB_OUTPUT"
 
@@ -248,6 +285,14 @@ jobs:
           echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
           echo "build_detail=ci" >> "$GITHUB_OUTPUT"
 
+      - name: Cache Pub packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
         with:
@@ -256,9 +301,10 @@ jobs:
           cache: true
 
       - name: Setup Tools
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ninja-build libgtk-3-dev libmpv-dev mpv ffmpeg libmimalloc-dev webkit2gtk-4.1 keybinder-3.0
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+        with:
+          packages: ninja-build libgtk-3-dev libmpv-dev mpv ffmpeg libmimalloc-dev webkit2gtk-4.1 keybinder-3.0
+          version: 1.0
 
       - name: Code Generation
         run: |
@@ -313,6 +359,14 @@ jobs:
           echo "git_hash=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
           echo "build_date=$(($(date +%s)*1000))" >> "$GITHUB_OUTPUT"
           echo "build_detail=ci" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Pub packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.8.0
