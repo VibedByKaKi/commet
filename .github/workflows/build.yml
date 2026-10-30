@@ -8,7 +8,23 @@ on:
       - dev
     tags:
       - '*'
+    paths:
+      - 'commet/**'
+      - 'tiamat/**'
+      - 'widgets/**'
+      - 'rust/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/build.yml'
   pull_request:
+    paths:
+      - 'commet/**'
+      - 'tiamat/**'
+      - 'widgets/**'
+      - 'rust/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/build.yml'
   merge_group:
   workflow_dispatch:
 
@@ -22,9 +38,54 @@ env:
   PUB_CACHE: ${{ github.workspace }}/.pub-cache
 
 jobs:
+  # One codegen pass for the whole matrix — saves ~2–3m × (N-1) billed minutes.
+  codegen:
+    if: github.ref != 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Pub packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.8.0
+        with:
+          flutter-version: '3.41.9'
+          channel: 'stable'
+          cache: true
+
+      - name: Code Generation
+        run: |
+          cd $PROJECT_PATH
+          dart run scripts/codegen.dart
+
+      - name: Package generated sources
+        run: |
+          set -euo pipefail
+          cd "$PROJECT_PATH"
+          mapfile -t gfiles < <(find . -name '*.g.dart' -print)
+          tar czf "$GITHUB_WORKSPACE/codegen-outputs.tar.gz" lib/generated "${gfiles[@]}"
+          ls -lh "$GITHUB_WORKSPACE/codegen-outputs.tar.gz"
+
+      - name: Upload generated sources
+        uses: actions/upload-artifact@v7
+        with:
+          name: codegen
+          path: codegen-outputs.tar.gz
+          retention-days: 1
+          archive: false
+
   build-windows:
     # Full matrix only when a tag is created. Pushes to `dev` skip all jobs.
     if: startsWith(github.ref, 'refs/tags/')
+    needs: codegen
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -63,11 +124,21 @@ jobs:
       - name: Configure Flutter
         run: flutter config --enable-windows-desktop
 
-      - name: Code Generation
+      - name: Download generated sources
+        uses: actions/download-artifact@v8
+        with:
+          name: codegen
+          path: .
+
+      - name: Restore generated sources
+        shell: bash
+        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+
+      - name: Pub get
         run: |
           cd .\commet
           git config --global core.longpaths true
-          dart run scripts/codegen.dart
+          flutter pub get
 
       - name: Build Windows App
         run: |
@@ -88,6 +159,7 @@ jobs:
 
   build-macos:
     if: startsWith(github.ref, 'refs/tags/')
+    needs: codegen
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -135,10 +207,19 @@ jobs:
       - name: Configure Flutter
         run: flutter config --enable-macos-desktop
 
-      - name: Code Generation
+      - name: Download generated sources
+        uses: actions/download-artifact@v8
+        with:
+          name: codegen
+          path: .
+
+      - name: Restore generated sources
+        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+
+      - name: Pub get
         run: |
           cd $PROJECT_PATH
-          dart run scripts/codegen.dart
+          flutter pub get
 
       - name: Align CocoaPods WebRTC-SDK pins
         run: |
@@ -175,6 +256,7 @@ jobs:
 
   build-android:
     if: github.ref != 'refs/heads/dev'
+    needs: codegen
     runs-on: ubuntu-latest
     steps:
       # Free disk without wiping hostedtoolcache (that forces a full Flutter reinstall).
@@ -234,10 +316,19 @@ jobs:
           restore-keys: |
             gradle-modules-${{ runner.os }}-
 
-      - name: Code Generation
+      - name: Download generated sources
+        uses: actions/download-artifact@v8
+        with:
+          name: codegen
+          path: .
+
+      - name: Restore generated sources
+        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+
+      - name: Pub get
         run: |
           cd $PROJECT_PATH
-          dart run scripts/codegen.dart
+          flutter pub get
 
       # arm64-only: fat multi-ABI APKs dominated the ~10m Build APK step.
       - name: Build APK
@@ -266,6 +357,7 @@ jobs:
 
   build-linux:
     if: github.ref != 'refs/heads/dev'
+    needs: codegen
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -306,10 +398,19 @@ jobs:
           packages: ninja-build libgtk-3-dev libmpv-dev mpv ffmpeg libmimalloc-dev webkit2gtk-4.1 keybinder-3.0
           version: 1.0
 
-      - name: Code Generation
+      - name: Download generated sources
+        uses: actions/download-artifact@v8
+        with:
+          name: codegen
+          path: .
+
+      - name: Restore generated sources
+        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+
+      - name: Pub get
         run: |
           cd $PROJECT_PATH
-          dart run scripts/codegen.dart
+          flutter pub get
 
       - name: Build Linux
         run: |
@@ -341,6 +442,7 @@ jobs:
 
   build-web:
     if: startsWith(github.ref, 'refs/tags/')
+    needs: codegen
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -375,10 +477,19 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Code Generation
+      - name: Download generated sources
+        uses: actions/download-artifact@v8
+        with:
+          name: codegen
+          path: .
+
+      - name: Restore generated sources
+        run: tar xzf codegen-outputs.tar.gz -C "$PROJECT_PATH"
+
+      - name: Pub get
         run: |
           cd $PROJECT_PATH
-          dart run scripts/codegen.dart
+          flutter pub get
 
       - name: Build Web
         run: |
