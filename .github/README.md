@@ -26,9 +26,10 @@ The **build** workflow:
 
 Pushes to `dev` do not build. Tag a commit on `dev` when you want the full matrix.
 
-Downloads live on the [Releases](https://github.com/VibedByKaKi/commet/releases) page as prereleases (preferred). The same files are also Actions artifacts for 90 days.
+Downloads are Actions artifacts (kept 90 days) on the tag’s workflow run.
 
-Artifact names include the version (tag name, or short commit sha on branches), for example `commet-linux-0.1.0-dev.4.zip` and `commet-android-debug-0.1.0-dev.4.apk`.
+Artifact names include the version (tag name, or short commit sha on branches), for example `commet-linux-0.1.0-dev.4` and `commet-android-debug-0.1.0-dev.4.apk`.
+
 
 Linux artifacts vendor `libmpv` and its uncommon runtime deps into `lib/`, and launch through a small wrapper.
 

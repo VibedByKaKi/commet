@@ -3,6 +3,12 @@ name: build
 
 on:
   push:
+    # Avoid empty skipped runs on the mirror / default branch.
+    branches-ignore:
+      - main
+      - dev
+    tags:
+      - '*'
   pull_request:
   merge_group:
   workflow_dispatch:
@@ -292,47 +298,3 @@ jobs:
           name: commet-web-${{ steps.meta.outputs.version }}
           path: commet/build/web
           retention-days: 90
-
-  publish-prerelease:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs:
-      - build-windows
-      - build-macos
-      - build-android
-      - build-linux
-      - build-web
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Package release assets
-        run: |
-          set -euo pipefail
-          mkdir -p release
-          # Single-file uploads (macOS zip, Android apk)
-          find artifacts -type f \( -name '*.zip' -o -name '*.apk' \) -print0 \
-            | xargs -0 -I{} cp -v {} release/
-          # Directory uploads (Windows, Linux, Web)
-          shopt -s nullglob
-          for dir in artifacts/commet-windows-* artifacts/commet-linux-* artifacts/commet-web-*; do
-            [[ -d "$dir" ]] || continue
-            name="$(basename "$dir")"
-            (cd "$dir" && zip -r "$GITHUB_WORKSPACE/release/${name}.zip" .)
-          done
-          ls -la release/
-          test "$(find release -type f | wc -l)" -gt 0
-
-      - name: Publish GitHub prerelease
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          prerelease: true
-          generate_release_notes: true
-          files: release/*

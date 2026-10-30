@@ -1,5 +1,13 @@
-on: push
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
+    tags-ignore:
+      - '**'
+  pull_request:
 name: integration-test
+
 
 env:
   HOMESERVER: localhost
