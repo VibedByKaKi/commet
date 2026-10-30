@@ -136,6 +136,14 @@ void main() async {
     exit(result.exitCode);
   }
 
+  // Upstream dropped flutter_intl.output_dir; integration tests still import
+  // integration_test/generated/l10n.dart. Mirror the intl_utils binding there.
+  final intlL10n = File('lib/generated/intl/l10n.dart');
+  if (intlL10n.existsSync()) {
+    Directory('integration_test/generated').createSync(recursive: true);
+    intlL10n.copySync('integration_test/generated/l10n.dart');
+  }
+
   var files = await generateFileLists();
   result = await generateFromArb(files);
   if (result.exitCode != 0) {

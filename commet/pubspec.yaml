@@ -195,8 +195,6 @@ flutter_intl:
   class_name: T
   main_locale: en
   arb_dir: assets/l10n
-  # Restored: upstream dropped this and broke integration_test imports of generated/l10n.dart.
-  output_dir: integration_test/generated
 
 flutter_launcher_icons: 
   image_path: assets/images/app_icon/app_icon_filled.png
