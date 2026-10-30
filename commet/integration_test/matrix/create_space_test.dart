@@ -33,7 +33,7 @@ void main() {
         client.spaces
             .firstWhere((element) => element.displayName == spaceName)
             .visibility,
-        equals(RoomVisibility.invite));
+        isA<RoomVisibilityPrivate>());
 
     await app.clientManager.close();
     await tester.clean();
@@ -58,7 +58,7 @@ void main() {
         client.spaces
             .firstWhere((element) => element.displayName == spaceName)
             .visibility,
-        equals(RoomVisibility.public));
+        isA<RoomVisibilityPublic>());
 
     await app.clientManager.close();
     await tester.clean();

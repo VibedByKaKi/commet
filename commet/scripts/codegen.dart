@@ -137,12 +137,32 @@ void main() async {
   }
 
   // Upstream dropped flutter_intl.output_dir; integration tests still import
-  // integration_test/generated/l10n.dart. Mirror the intl_utils binding there.
-  final intlL10n = File('lib/generated/intl/l10n.dart');
-  if (intlL10n.existsSync()) {
-    Directory('integration_test/generated').createSync(recursive: true);
-    intlL10n.copySync('integration_test/generated/l10n.dart');
+  // integration_test/generated/l10n.dart. Mirror the generated T binding there.
+  final candidates = [
+    File('lib/generated/intl/l10n.dart'),
+    File('lib/generated/l10n/l10n.dart'),
+  ];
+  File? source;
+  for (final f in candidates) {
+    if (f.existsSync()) {
+      source = f;
+      break;
+    }
   }
+  if (source == null) {
+    final intlDir = Directory('lib/generated/intl');
+    if (intlDir.existsSync()) {
+      print('intl_utils outputs:');
+      for (final e in intlDir.listSync()) {
+        print('  ${e.path}');
+      }
+    }
+    print('ERROR: no generated l10n.dart found to mirror for integration_test');
+    exit(1);
+  }
+  Directory('integration_test/generated').createSync(recursive: true);
+  source.copySync('integration_test/generated/l10n.dart');
+  print('Mirrored ${source.path} -> integration_test/generated/l10n.dart');
 
   var files = await generateFileLists();
   result = await generateFromArb(files);
