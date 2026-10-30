@@ -60,7 +60,7 @@ jobs:
         with:
           name: commet-windows-${{ steps.meta.outputs.version }}
           path: commet/build/windows/x64/runner/Release
-          retention-days: 14
+          retention-days: 90
 
   build-macos:
     if: startsWith(github.ref, 'refs/tags/')
@@ -130,7 +130,7 @@ jobs:
         with:
           path: dist/commet-macos-${{ steps.meta.outputs.version }}.zip
           archive: false
-          retention-days: 14
+          retention-days: 90
 
   build-android:
     if: github.ref != 'refs/heads/dev'
@@ -193,7 +193,7 @@ jobs:
         with:
           path: ${{ steps.prepare.outputs.apk_filename }}
           archive: false
-          retention-days: 14
+          retention-days: 90
 
   build-linux:
     if: github.ref != 'refs/heads/dev'
@@ -250,7 +250,7 @@ jobs:
         with:
           name: commet-linux-${{ steps.meta.outputs.version }}
           path: commet/build/linux/x64/release/bundle
-          retention-days: 14
+          retention-days: 90
 
   build-web:
     if: startsWith(github.ref, 'refs/tags/')
@@ -291,4 +291,48 @@ jobs:
         with:
           name: commet-web-${{ steps.meta.outputs.version }}
           path: commet/build/web
-          retention-days: 14
+          retention-days: 90
+
+  publish-prerelease:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build-windows
+      - build-macos
+      - build-android
+      - build-linux
+      - build-web
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Package release assets
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          # Single-file uploads (macOS zip, Android apk)
+          find artifacts -type f \( -name '*.zip' -o -name '*.apk' \) -print0 \
+            | xargs -0 -I{} cp -v {} release/
+          # Directory uploads (Windows, Linux, Web)
+          shopt -s nullglob
+          for dir in artifacts/commet-windows-* artifacts/commet-linux-* artifacts/commet-web-*; do
+            [[ -d "$dir" ]] || continue
+            name="$(basename "$dir")"
+            (cd "$dir" && zip -r "$GITHUB_WORKSPACE/release/${name}.zip" .)
+          done
+          ls -la release/
+          test "$(find release -type f | wc -l)" -gt 0
+
+      - name: Publish GitHub prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          prerelease: true
+          generate_release_notes: true
+          files: release/*

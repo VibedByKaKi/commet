@@ -26,18 +26,18 @@ The **build** workflow:
 
 Pushes to `dev` do not build. Tag a commit on `dev` when you want the full matrix.
 
-Artifact names include the version (tag name, or short commit sha on branches), for example `commet-linux-0.1.0-dev.2` and `commet-android-debug-0.1.0-dev.2.apk`.
+Downloads live on the [Releases](https://github.com/VibedByKaKi/commet/releases) page as prereleases (preferred). The same files are also Actions artifacts for 90 days.
 
-APKs upload as single files (not wrapped in a zip). Windows, Linux, and Web builds are directories, so those stay zipped.
+Artifact names include the version (tag name, or short commit sha on branches), for example `commet-linux-0.1.0-dev.4.zip` and `commet-android-debug-0.1.0-dev.4.apk`.
 
 Linux artifacts vendor `libmpv` and its uncommon runtime deps into `lib/`, and launch through a small wrapper.
 
-### macOS artifacts
+### macOS
 
-Tag builds upload `commet-macos-<tag>.zip`. Unzipping yields a `commet.app` bundle. Builds are ad-hoc signed; after downloading, clear Gatekeeper quarantine before opening:
+Unzipping yields a `commet.app` bundle. Builds are ad-hoc signed; after downloading, clear Gatekeeper quarantine before opening:
 
 ```bash
-unzip commet-macos-0.1.0-dev.2.zip
+unzip commet-macos-0.1.0-dev.4.zip
 xattr -cr commet.app
 open commet.app
 ```
