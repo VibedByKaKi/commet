@@ -146,28 +146,4 @@ void main() async {
   if (result.exitCode != 0) {
     exit(result.exitCode);
   }
-
-  // Upstream dropped flutter_intl.output_dir; integration tests still import
-  // integration_test/generated/l10n.dart. Flutter gen-l10n writes the T class
-  // under lib/generated/l10n/ (not intl/); mirror that whole set.
-  final l10nDir = Directory('lib/generated/l10n');
-  if (!l10nDir.existsSync()) {
-    print('ERROR: lib/generated/l10n missing after codegen');
-    exit(1);
-  }
-  final destDir = Directory('integration_test/generated')
-    ..createSync(recursive: true);
-  var mirrored = 0;
-  for (final entity in l10nDir.listSync()) {
-    if (entity is! File) continue;
-    final name = entity.uri.pathSegments.last;
-    if (!name.startsWith('l10n') || !name.endsWith('.dart')) continue;
-    entity.copySync('${destDir.path}/$name');
-    mirrored++;
-    print('Mirrored ${entity.path} -> ${destDir.path}/$name');
-  }
-  if (mirrored == 0 || !File('${destDir.path}/l10n.dart').existsSync()) {
-    print('ERROR: failed to mirror l10n bindings for integration_test');
-    exit(1);
-  }
 }
