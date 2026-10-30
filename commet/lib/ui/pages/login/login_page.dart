@@ -176,7 +176,8 @@ class LoginPageState extends State<LoginPage> {
       isServerValid = false;
     });
 
-    var uri = Uri.https(input);
+    // Local / IP homeservers (CI Synapse) usually speak HTTP; everyone else HTTPS.
+    final uri = _homeserverUri(input);
     var result = await loginClient!.setHomeserver(uri);
 
     setState(() {
@@ -185,4 +186,21 @@ class LoginPageState extends State<LoginPage> {
       loginFlows = result.$2;
     });
   }
+
+  /// Builds a homeserver URI from the login field (prefixText is display-only).
+  static Uri _homeserverUri(String input) {
+    final trimmed = input.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return Uri.parse(trimmed);
+    }
+
+    final host = trimmed.split('/').first.split(':').first;
+    final isLocal = host == 'localhost' ||
+        host == '127.0.0.1' ||
+        host == '::1' ||
+        RegExp(r'^\d{1,3}(\.\d{1,3}){3}$').hasMatch(host);
+
+    return isLocal ? Uri.http(trimmed) : Uri.https(trimmed);
+  }
 }
+

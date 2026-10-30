@@ -44,6 +44,9 @@ void main() {
 
     await tester.enterText(inputs.at(0), hs);
     await tester.pumpAndSettle();
+    await tester.waitFor(() => find.byType(TextField).evaluate().length >= 3,
+        timeout: const Duration(seconds: 15));
+    inputs = find.byType(TextField);
     await tester.enterText(inputs.at(1), username);
     await tester.pumpAndSettle();
     await tester.enterText(inputs.at(2), password);
@@ -55,7 +58,7 @@ void main() {
     await tester.waitFor(
         () => find.text(T.current.messageLoginFailed).evaluate().isNotEmpty,
         skipPumpAndSettle: false,
-        timeout: const Duration(seconds: 5));
+        timeout: const Duration(seconds: 15));
     await tester.pumpFrames(app, const Duration(seconds: 1));
     expect(app.clientManager.isLoggedIn(), equals(false));
 

@@ -60,52 +60,55 @@ extension CommonFlows on WidgetTester {
     return App(clientManager: clientManager!);
   }
 
-  Future<void> login(App app) async {
+  Future<void> _enterHomeserverAndWaitForPasswordLogin() async {
     await waitFor(() => find.byType(LoginPage).evaluate().isNotEmpty);
 
-    var button = find.widgetWithText(ElevatedButton, "Login");
-
+    // Homeserver field is prefilled (e.g. matrix.org). Replace with CI Synapse.
     var inputs = find.byType(TextField);
     expect(inputs, findsWidgets);
-
-    // Build our app and trigger a frame.
-
     await enterText(inputs.at(0), homeserver);
     await pumpAndSettle();
+
+    // LoginPage debounces homeserver checks by 1s, then reveals password fields.
+    await waitFor(() => find.byType(TextField).evaluate().length >= 3,
+        timeout: const Duration(seconds: 15));
+  }
+
+  Future<void> login(App app) async {
+    await _enterHomeserverAndWaitForPasswordLogin();
+
+    var button = find.widgetWithText(ElevatedButton, "Login");
+    var inputs = find.byType(TextField);
+
     await enterText(inputs.at(1), username);
     await pumpAndSettle();
     await enterText(inputs.at(2), password);
     await pumpAndSettle();
 
     await tap(button);
-
     await pumpAndSettle();
 
     await waitFor(() => app.clientManager.isLoggedIn(),
-        timeout: const Duration(seconds: 5), skipPumpAndSettle: true);
+        timeout: const Duration(seconds: 15), skipPumpAndSettle: true);
     expect(app.clientManager.isLoggedIn(), equals(true));
   }
 
   Future<void> loginUser2(App app) async {
-    await waitFor(() => find.byType(LoginPage).evaluate().isNotEmpty);
+    await _enterHomeserverAndWaitForPasswordLogin();
+
     var button = find.widgetWithText(ElevatedButton, "Login");
-
     var inputs = find.byType(TextField);
-    expect(inputs, findsWidgets);
 
-    await enterText(inputs.at(0), homeserver);
-    await pumpAndSettle();
     await enterText(inputs.at(1), userTwoName);
     await pumpAndSettle();
     await enterText(inputs.at(2), userTwoPassword);
     await pumpAndSettle();
 
     await tap(button);
-
     await pumpAndSettle();
 
     await waitFor(() => app.clientManager.isLoggedIn(),
-        timeout: const Duration(seconds: 5), skipPumpAndSettle: true);
+        timeout: const Duration(seconds: 15), skipPumpAndSettle: true);
     expect(app.clientManager.isLoggedIn(), equals(true));
   }
 

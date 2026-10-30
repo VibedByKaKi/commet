@@ -238,7 +238,15 @@ class MatrixClient extends Client {
 
   static Future<void> _checkSystem(ClientManager clientManager) async {
     try {
-      await vod.init(wasmPath: './assets/assets/vodozemac/');
+      // vodozemac's FRB entrypoint may only be initialized once per process
+      // (integration tests call ClientManager.init repeatedly).
+      var alreadyInitialized = false;
+      try {
+        alreadyInitialized = vod.isInitialized();
+      } catch (_) {}
+      if (!alreadyInitialized) {
+        await vod.init(wasmPath: './assets/assets/vodozemac/');
+      }
       if (!vod.isInitialized()) {
         throw Exception("Vodozemac failed to initialize!");
       }
