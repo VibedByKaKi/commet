@@ -192,9 +192,11 @@ dev_dependencies:
   file: any
   
 flutter_intl:
+  enabled: true
   class_name: T
   main_locale: en
   arb_dir: assets/l10n
+  output_dir: lib/generated
 
 flutter_launcher_icons: 
   image_path: assets/images/app_icon/app_icon_filled.png
