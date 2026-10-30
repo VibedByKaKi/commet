@@ -55,10 +55,12 @@ jobs:
           exit $INTEGRATION_TEST_EXIT_CODE
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v7
         with:
           name: result.mkv
           path: commet/video.mkv
+          archive: false
+
 
       - name: Store benchmark result - separate results repo
         uses: benchmark-action/github-action-benchmark@v1
