@@ -125,6 +125,24 @@ class LoginPageState extends State<LoginPage> {
       null => throw UnimplementedError(),
     };
 
+    if (result is LoginResultSuccess) {
+      final mxid = loginClient!.self?.identifier;
+      final alreadyLoggedIn = mxid != null &&
+          (clientManager?.clients
+                  .any((client) => client.self?.identifier == mxid) ??
+              false);
+      if (alreadyLoggedIn) {
+        result = LoginResultAlreadyLoggedIn();
+        message = messageAlreadyLoggedIn;
+        setState(() {
+          isLoggingIn = false;
+        });
+      } else {
+        clientManager?.addClient(loginClient!);
+        widget.onSuccess?.call(loginClient!);
+      }
+    }
+
     if (message != null) {
       if (mounted) {
         AdaptiveDialog.show(
@@ -135,11 +153,6 @@ class LoginPageState extends State<LoginPage> {
           ),
         );
       }
-    }
-
-    if (result is LoginResultSuccess) {
-      clientManager?.addClient(loginClient!);
-      widget.onSuccess?.call(loginClient!);
     }
   }
 
