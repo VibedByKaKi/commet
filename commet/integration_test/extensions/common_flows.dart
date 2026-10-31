@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:commet/config/app_config.dart';
-import 'package:commet/ui/organisms/side_navigation_bar/side_navigation_bar.dart';
 import 'package:commet/ui/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:commet/main.dart';
 import 'package:matrix/matrix.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tiamat/tiamat.dart' as tiamat;
 
 import 'wait_for.dart';
 
@@ -140,11 +140,12 @@ extension CommonFlows on WidgetTester {
   }
 
   Future<void> openSettings(App app) async {
-    await dragUntilVisible(find.byKey(SideNavigationBar.settingsKey),
-        find.byType(SideNavigationBar), const Offset(0, 20));
-
-    await tap(find.byKey(SideNavigationBar.settingsKey));
-
+    // Settings lives on the session panel (gear icon), not the side nav key.
+    final settingsButton =
+        find.widgetWithIcon(tiamat.IconButton, Icons.settings);
+    await waitFor(() => settingsButton.evaluate().isNotEmpty,
+        timeout: const Duration(seconds: 10));
+    await tap(settingsButton.first);
     await pumpAndSettle();
   }
 }

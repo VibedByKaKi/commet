@@ -55,8 +55,9 @@ void main() {
     var button = find.widgetWithText(ElevatedButton, "Login");
 
     await tester.tap(button);
+    // Failures surface as an AdaptiveDialog titled "Login failed".
     await tester.waitFor(
-        () => find.text(T.current.messageLoginFailed).evaluate().isNotEmpty,
+        () => find.text("Login failed").evaluate().isNotEmpty,
         skipPumpAndSettle: false,
         timeout: const Duration(seconds: 15));
     await tester.pumpFrames(app, const Duration(seconds: 1));
