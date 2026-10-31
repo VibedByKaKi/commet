@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:commet/main.dart';
 import 'package:commet/utils/event_bus.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +14,19 @@ class CustomSafeArea extends StatefulWidget {
 
 class _CustomSafeAreaState extends State<CustomSafeArea> {
   bool isTextFieldFocused = false;
+  StreamSubscription<bool>? _focusSubscription;
 
   @override
   void initState() {
-    EventBus.onTextFieldFocused.stream.listen(onTextFieldFocused);
+    _focusSubscription =
+        EventBus.onTextFieldFocused.stream.listen(onTextFieldFocused);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _focusSubscription?.cancel();
+    super.dispose();
   }
 
   @override
@@ -40,6 +50,7 @@ class _CustomSafeAreaState extends State<CustomSafeArea> {
   }
 
   void onTextFieldFocused(bool event) {
+    if (!mounted) return;
     if (event != isTextFieldFocused) {
       setState(() {
         isTextFieldFocused = event;
