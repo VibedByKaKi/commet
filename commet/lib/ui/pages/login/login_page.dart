@@ -143,16 +143,13 @@ class LoginPageState extends State<LoginPage> {
       }
     }
 
-    if (message != null) {
-      if (mounted) {
-        AdaptiveDialog.show(
-          context,
-          title: "Login failed",
-          builder: (_) => tiamat.Text(
-            message,
-          ),
-        );
-      }
+    final errorMessage = message;
+    if (errorMessage != null && mounted) {
+      AdaptiveDialog.show(
+        context,
+        title: "Login failed",
+        builder: (_) => tiamat.Text(errorMessage),
+      );
     }
   }
 
