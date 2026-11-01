@@ -47,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     subscriptions = [
       widget.clientManager.onSync.stream.listen(onSync),
       widget.clientManager.onClientRemoved.stream.listen((_) {
+        if (!mounted) return;
         setState(() {
           updateRecent();
         });
@@ -72,7 +73,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onSync(void event) {
-    Future.delayed(Duration(seconds: 1)).then((_) {
+    Future.delayed(const Duration(seconds: 1)).then((_) {
+      if (!mounted) return;
       setState(() {
         updateRecent();
       });
@@ -192,6 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void setFilterClient(Client? event) {
+    if (!mounted) return;
     setState(() {
       filterClient = event;
       updateRecent();
