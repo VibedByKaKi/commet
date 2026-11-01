@@ -173,7 +173,7 @@ jobs:
           retention-days: 90
 
   build-macos:
-    if: startsWith(github.ref, 'refs/tags/')
+    if: github.ref != 'refs/heads/dev'
     needs: codegen
     runs-on: macos-latest
     steps:
