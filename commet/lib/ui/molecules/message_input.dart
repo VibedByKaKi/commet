@@ -23,6 +23,7 @@ import 'package:commet/ui/navigation/adaptive_dialog.dart';
 import 'package:commet/ui/organisms/chat/chat.dart';
 import 'package:commet/client/components/emoticon/emoji_pack.dart';
 import 'package:commet/client/components/gif/gif_search_result.dart';
+import 'package:commet/debug/log.dart';
 import 'package:commet/utils/autofill_utils.dart';
 import 'package:commet/utils/debounce.dart';
 import 'package:commet/utils/event_bus.dart';
@@ -1143,7 +1144,7 @@ class MessageInputState extends State<MessageInput> {
     }
   }
 
-  void addAttachment() async {
+  Future<void> addAttachment() async {
     var pickers = [
       if (PlatformUtils.isAndroid)
         AttachmentPicker(
@@ -1165,18 +1166,31 @@ class MessageInputState extends State<MessageInput> {
           icon: Icons.attach_file,
           label: "File",
           execute: () async {
-            FilePickerResult? result = await FilePicker.platform.pickFiles(
-                type: FileType.any, withData: true, allowMultiple: true);
-            if (result == null) return;
+            try {
+              // Desktop/macOS only needs paths; withData is required on web.
+              FilePickerResult? result = await FilePicker.platform.pickFiles(
+                  type: FileType.any,
+                  withData: PlatformUtils.isWeb,
+                  allowMultiple: true);
+              if (result == null) return;
 
-            for (var file in result.files) {
-              var attachment = PendingFileAttachment(
-                  name: file.name,
-                  path: PlatformUtils.isWeb ? null : file.path,
-                  data: file.bytes,
-                  size: file.bytes?.length);
+              for (var file in result.files) {
+                final path = PlatformUtils.isWeb ? null : file.path;
+                final data = file.bytes;
+                if (path == null && data == null) continue;
 
-              await handlePickedAttachment(attachment);
+                var attachment = PendingFileAttachment(
+                    name: file.name,
+                    path: path,
+                    data: data,
+                    size: file.size);
+
+                await handlePickedAttachment(attachment);
+              }
+            } on PlatformException catch (e, st) {
+              // macOS returns ENTITLEMENT_NOT_FOUND when sandbox file access
+              // is missing — previously unawaited, so the + button looked dead.
+              Log.e("File picker failed: ${e.code} ${e.message}\n$st");
             }
           }),
       if (PlatformUtils.isAndroid && preferences.developerMode.value)
@@ -1214,7 +1228,7 @@ class MessageInputState extends State<MessageInput> {
     ];
 
     if (pickers.length == 1) {
-      pickers.first.execute();
+      await pickers.first.execute();
     } else {
       final picker = await AdaptiveDialog.pickOne(context,
           items: pickers,
@@ -1227,7 +1241,7 @@ class MessageInputState extends State<MessageInput> {
                 ),
               ));
 
-      picker?.execute();
+      await picker?.execute();
     }
   }
 

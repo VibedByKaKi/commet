@@ -262,9 +262,14 @@ jobs:
         run: |
           set -euo pipefail
           APP="$PROJECT_PATH/build/macos/Build/Products/Release/commet.app"
-          # Ad-hoc sign the whole bundle so embedded frameworks (e.g. Ass) load.
-          codesign --force --deep --sign - "$APP"
+          ENTITLEMENTS="$PROJECT_PATH/macos/Runner/Release.entitlements"
+          # Ad-hoc sign so embedded frameworks (e.g. Ass) load. Must pass
+          # --entitlements: a bare re-sign strips sandbox file-access rights and
+          # file_picker then fails with ENTITLEMENT_NOT_FOUND (button looks dead).
+          codesign --force --deep --sign - --entitlements "$ENTITLEMENTS" "$APP"
           codesign --verify --deep --strict "$APP"
+          codesign -d --entitlements :- "$APP" 2>/dev/null \
+            | grep -q 'com.apple.security.files.user-selected.read-write'
           mkdir -p dist
           # KeepParent so the zip's top-level folder is commet.app, not the artifact name.
           ditto -c -k --keepParent "$APP" "dist/commet-macos-${{ steps.meta.outputs.version }}.zip"
