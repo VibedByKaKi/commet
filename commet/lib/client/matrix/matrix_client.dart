@@ -34,7 +34,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import 'package:matrix/encryption.dart';
-import 'package:flutter_vodozemac/flutter_vodozemac.dart' as vodozemac;
+import 'package:commet/client/matrix/vodozemac_init.dart';
 
 import '../../ui/atoms/code_block.dart';
 import 'matrix_room.dart';
@@ -173,10 +173,10 @@ class MatrixClient extends Client {
       );
 
   static String get matrixClientVodozemacMissingMessage => Intl.message(
-        "vodozemac is not installed or was not found. End to End Encryption will not be available until this is resolved",
+        "The bundled encryption library failed to load. End to End Encryption will not be available until this is resolved",
         name: "matrixClientVodozemacMissingMessage",
         desc:
-            "Text that explains to the user that vodozemac dependency is not found",
+            "Text that explains to the user that the bundled vodozemac library failed to initialize",
       );
 
   static String get matrixClientEncryptionWarningTitle => Intl.message(
@@ -245,7 +245,9 @@ class MatrixClient extends Client {
         alreadyInitialized = vod.isInitialized();
       } catch (_) {}
       if (!alreadyInitialized) {
-        await vod.init(wasmPath: './assets/assets/vodozemac/');
+        // Bundled via flutter_vodozemac; load with the platform stem/path
+        // (Apple uses flutter_vodozemac.framework under Contents/Frameworks).
+        await initVodozemac();
       }
       if (!vod.isInitialized()) {
         throw Exception("Vodozemac failed to initialize!");
@@ -267,7 +269,7 @@ class MatrixClient extends Client {
           ? const matrix.NativeImplementationsDummy()
           : matrix.NativeImplementationsIsolate(
               compute,
-              vodozemacInit: vodozemac.init,
+              vodozemacInit: initVodozemac,
             );
   @override
   Future<void> init(

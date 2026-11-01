@@ -25,6 +25,7 @@ import 'package:matrix/encryption/utils/stored_inbound_group_session.dart'
 import 'package:matrix_dart_sdk_drift_db/database.dart';
 import 'package:matrix/matrix.dart' as matrix;
 
+import 'package:commet/client/matrix/vodozemac_init.dart';
 import 'package:vodozemac/vodozemac.dart' as vod;
 
 class MatrixBackgroundRoom implements Room {
@@ -190,7 +191,7 @@ class MatrixBackgroundRoom implements Room {
     var sessionKey = key["session_key"];
 
     if (vod.isInitialized() == false) {
-      await vod.init();
+      await initVodozemac();
     }
 
     var sess = _createSession(sessionKey);
