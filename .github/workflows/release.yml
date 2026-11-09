@@ -120,7 +120,7 @@ jobs:
       - name: Setup Signatures
         run: |
           cd $PROJECT_PATH
-          dart run scripts/setup_android_release.dart --key_password ${{ secrets.ANDROID_KEY_PASSWORD }} --key_b64 ${{ secrets.ANDROID_KEY_STORE_B64 }}
+          dart run scripts/setup_android_release.dart --key_password ${{ secrets.ANDROID_KEY_PASSWORD }} --key_b64 ${{ secrets.ANDROID_KEY_STORE_B64 }} --key_alias ${{ secrets.ANDROID_KEY_ALIAS || 'key' }}
           
       - name: Build APK
         run: |
@@ -206,7 +206,7 @@ jobs:
       - name: Setup Signatures
         run: |
           cd $PROJECT_PATH
-          dart run scripts/setup_android_release.dart --key_password ${{ secrets.ANDROID_KEY_PASSWORD }} --key_b64 ${{ secrets.ANDROID_KEY_STORE_B64 }}
+          dart run scripts/setup_android_release.dart --key_password ${{ secrets.ANDROID_KEY_PASSWORD }} --key_b64 ${{ secrets.ANDROID_KEY_STORE_B64 }} --key_alias ${{ secrets.ANDROID_KEY_ALIAS || 'key' }}
           
       - name: Build APK
         run: |
