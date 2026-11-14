@@ -141,6 +141,9 @@ dependencies:
 dependency_overrides:
   analyzer: ^7.3.0
   pointycastle: ^4.0.0
+  # Upstream 0.2.0 fails clang -Werror=-Wsometimes-uninitialized on Linux CI.
+  hotkey_manager_linux:
+    path: ../third_party/hotkey_manager_linux
 
   ## For inline-reply 
   flutter_local_notifications_linux: 
