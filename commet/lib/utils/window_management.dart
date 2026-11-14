@@ -59,7 +59,7 @@ class WindowManagement {
     final result = [
       _currentRoomName,
       _currentSpaceName,
-      "commet",
+      "Halley",
     ].whereNot((a) => a == null).join(" | ");
     windowManager.setTitle(result);
   }

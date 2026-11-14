@@ -34,7 +34,7 @@ static void my_application_activate(GApplication* application) {
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
   
-  gtk_window_set_title(window, "commet");
+  gtk_window_set_title(window, "Halley");
   
   const string iconFilename = "assets/images/app_icon/app_icon_rounded.png";
   path execDir = canonical(read_symlink("/proc/self/exe")).parent_path();

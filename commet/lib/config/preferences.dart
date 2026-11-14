@@ -405,6 +405,12 @@ class Preferences {
   BoolPreference showRoomsInSidebar =
       BoolPreference("show_rooms_in_sidebar", defaultValue: false);
 
+  BoolPreference hideRecentActivityFromHome =
+      BoolPreference("hide_recent_activity_from_home", defaultValue: false);
+
+  BoolPreference hideRoomsFromHome =
+      BoolPreference("hide_rooms_from_home", defaultValue: false);
+
   BoolPreference usePlaceholderRoomAvatars =
       BoolPreference("use_placeholder_room_avatars", defaultValue: false);
 

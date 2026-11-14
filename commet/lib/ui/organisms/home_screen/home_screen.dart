@@ -53,6 +53,14 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }),
       EventBus.setFilterClient.stream.listen(setFilterClient),
+      preferences.hideRecentActivityFromHome.onChanged.listen((_) {
+        if (!mounted) return;
+        setState(() {});
+      }),
+      preferences.hideRoomsFromHome.onChanged.listen((_) {
+        if (!mounted) return;
+        setState(() {});
+      }),
     ];
 
     if (preferences.checkForUpdates.value == true) {
@@ -169,6 +177,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       rooms: widget.clientManager
                           .singleRooms(filterClient: filterClient),
                       recentActivity: recentActivity,
+                      hideRecentActivity:
+                          preferences.hideRecentActivityFromHome.value,
+                      hideRooms: preferences.hideRoomsFromHome.value,
                       onRoomClicked: (room) => EventBus.doOpenRoom(
                           room.identifier,
                           clientId: room.client.identifier),

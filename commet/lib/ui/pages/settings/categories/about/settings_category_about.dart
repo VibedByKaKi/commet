@@ -148,6 +148,24 @@ class _AppInfoState extends State<_AppInfo> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const tiamat.Text.largeTitle(BuildConfig.appName),
+                      Text.rich(
+                        TextSpan(
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          children: [
+                            const TextSpan(text: "Halley is a "),
+                            TextSpan(
+                              text: "Commet",
+                              style: const TextStyle(
+                                  decoration: TextDecoration.underline),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => LinkUtils.open(
+                                    Uri.parse(
+                                        "https://github.com/commetchat/commet"),
+                                    context: context),
+                            ),
+                          ],
+                        ),
+                      ),
                       const tiamat.Text.labelEmphasised(
                           BuildConfig.VERSION_TAG),
                       tiamat.Text.labelLow(

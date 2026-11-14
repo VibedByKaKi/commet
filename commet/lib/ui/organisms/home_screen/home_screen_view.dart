@@ -22,6 +22,8 @@ class HomeScreenView extends StatelessWidget {
   final Future<void> Function(Invitation invite)? rejectInvite;
   final Future<void> Function(Client client, String address)? joinRoom;
   final Future<void> Function(Client client, CreateRoomArgs args)? createRoom;
+  final bool hideRecentActivity;
+  final bool hideRooms;
 
   const HomeScreenView(
       {super.key,
@@ -33,7 +35,9 @@ class HomeScreenView extends StatelessWidget {
       this.rejectInvite,
       this.joinRoom,
       this.createRoom,
-      this.invitations});
+      this.invitations,
+      this.hideRecentActivity = false,
+      this.hideRooms = false});
 
   String get labelHomeRecentActivity => Intl.message("Recent Activity",
       name: "labelHomeRecentActivity",
@@ -63,15 +67,16 @@ class HomeScreenView extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
             child: invitationsList(),
           ),
-        if (recentActivity?.isNotEmpty == true)
+        if (!hideRecentActivity && recentActivity?.isNotEmpty == true)
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
             child: recentRooms(),
           ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
-          child: roomsList(context),
-        )
+        if (!hideRooms)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
+            child: roomsList(context),
+          )
       ],
     );
   }

@@ -1,11 +1,11 @@
 {
-    "name": "commet",
-    "short_name": "commet",
+    "name": "Halley",
+    "short_name": "Halley",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Your space to connect!",
+    "description": "Halley is a Commet",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

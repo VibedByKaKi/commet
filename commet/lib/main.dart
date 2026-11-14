@@ -114,7 +114,7 @@ void bubble() async {
   var initialTheme = await preferences.resolveTheme();
 
   runApp(MaterialApp(
-      title: 'Commet',
+      title: 'Halley',
       theme: initialTheme,
       navigatorKey: navigator,
       debugShowCheckedModeBanner: false,
@@ -378,7 +378,7 @@ class App extends StatelessWidget {
                 initialTheme: initialTheme ?? ThemeDark.theme,
                 materialAppBuilder: (context, theme) {
                   return MaterialApp(
-                    title: 'Commet',
+                    title: 'Halley',
                     theme: theme,
                     showPerformanceOverlay:
                         preferences.showPerformanceOverlay.value,
