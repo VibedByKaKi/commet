@@ -80,16 +80,17 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
       desc:
           "Description for enabling using collapsing of room state events in the timeline");
 
-  String get labelShowRoomsInSidebar => Intl.message("Show rooms in sidebar",
-      name: "labelShowRoomsInSidebar",
-      desc:
-          "Label for the toggle which shows an extra entry for rooms which are not contained in a space in the sidebar");
+  String get labelShowRoomsInSidebar =>
+      Intl.message("Show rooms in Home sidebar",
+          name: "labelShowRoomsInSidebar",
+          desc:
+              "Label for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar");
 
   String get labelShowRoomsInSidebarDescription => Intl.message(
-      "Add an entry to the sidebar that shows all rooms which are not contained in a space",
+      "Add an entry below Direct messages for rooms which are not contained in a space",
       name: "labelShowRoomsInSidebarDescription",
       desc:
-          "Description for the toggle which shows an extra entry for rooms which are not contained in a space in the sidebar");
+          "Description for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar");
 
   String get labelHideRecentActivityFromHome =>
       Intl.message("Hide recent activity from Home",
@@ -122,31 +123,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     return Column(
       children: [
         themeSettings(context),
-        const SizedBox(
-          height: 10,
-        ),
-        Panel(
-          header: "Halley options",
-          mode: TileType.surfaceContainerLow,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: Column(
-              children: [
-                BooleanPreferenceToggle(
-                  preference: preferences.hideRecentActivityFromHome,
-                  title: labelHideRecentActivityFromHome,
-                  description: labelHideRecentActivityFromHomeDescription,
-                ),
-                const Seperator(),
-                BooleanPreferenceToggle(
-                  preference: preferences.hideRoomsFromHome,
-                  title: labelHideRoomsFromHome,
-                  description: labelHideRoomsFromHomeDescription,
-                ),
-              ],
-            ),
-          ),
-        ),
         const SizedBox(
           height: 10,
         ),
@@ -198,12 +174,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 ),
                 const Seperator(),
                 BooleanPreferenceToggle(
-                  preference: preferences.showRoomsInSidebar,
-                  title: labelShowRoomsInSidebar,
-                  description: labelShowRoomsInSidebarDescription,
-                ),
-                const Seperator(),
-                BooleanPreferenceToggle(
                   preference: preferences.showRoomAvatars,
                   title: labelUseRoomAvatars,
                   description: labelEnableRoomIconsDescription,
@@ -225,6 +195,37 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   title: labelCollapseStateEvents,
                   description: labelCollapseStateEventsDescription,
                 )
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Panel(
+          header: "Halley Options",
+          mode: TileType.surfaceContainerLow,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+            child: Column(
+              children: [
+                BooleanPreferenceToggle(
+                  preference: preferences.showRoomsInSidebar,
+                  title: labelShowRoomsInSidebar,
+                  description: labelShowRoomsInSidebarDescription,
+                ),
+                const Seperator(),
+                BooleanPreferenceToggle(
+                  preference: preferences.hideRecentActivityFromHome,
+                  title: labelHideRecentActivityFromHome,
+                  description: labelHideRecentActivityFromHomeDescription,
+                ),
+                const Seperator(),
+                BooleanPreferenceToggle(
+                  preference: preferences.hideRoomsFromHome,
+                  title: labelHideRoomsFromHome,
+                  description: labelHideRoomsFromHomeDescription,
+                ),
               ],
             ),
           ),

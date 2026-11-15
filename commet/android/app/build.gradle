@@ -58,6 +58,11 @@ android {
         targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        // Plugins still ship armeabi-v7a / x86_64 .so files even when Flutter is
+        // built with --target-platform=android-arm64; drop them from the APK.
+        ndk {
+            abiFilters "arm64-v8a"
+        }
     }
 
     signingConfigs {

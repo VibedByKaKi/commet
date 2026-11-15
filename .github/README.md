@@ -1,10 +1,15 @@
 # VibedByKaKi/commet
 
-Personal fork of [Commet](https://github.com/commetchat/commet). Work happens on [`dev`](https://github.com/VibedByKaKi/commet/tree/dev). [`main`](https://github.com/VibedByKaKi/commet/tree/main) tracks upstream.
+Matrix client for Android, Linux, Windows, and macOS. Fork of [Commet](https://github.com/commetchat/commet).
 
-Upstream does not accept generative-AI contributions, so changes here stay on this fork. They will not be opened as PRs upstream.
+The upstream project README stays in [README.md](../README.md) at the repository root.
 
-The upstream project README is still in [README.md](../README.md) at the repository root.
+| [![](assets/get-it-on-github.png)](https://github.com/VibedByKaKi/commet/releases/tag/latest) | [![](assets/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522chat.halley.halleyapp%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FVibedByKaKi%252Fcommet%2522%252C%2522author%2522%253A%2522VibedByKaKi%2522%252C%2522name%2522%253A%2522Halley%2522%252C%2522preferredApkIndex%2522%253A0%252C%2522additionalSettings%2522%253A%2522%257B%255C%2522includePrereleases%255C%2522%253A%2520true%252C%2520%255C%2522fallbackToOlderReleases%255C%2522%253A%2520true%252C%2520%255C%2522apkFilterRegEx%255C%2522%253A%2520%255C%2522.%252A%255C%255C%255C%255C.apk%2524%255C%2522%252C%2520%255C%2522releaseDateAsVersion%255C%2522%253A%2520true%257D%2522%257D) |
+| --- | --- |
+
+The APK is a rolling GitHub prerelease on the [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) tag. Direct download: [Halley.apk](https://github.com/VibedByKaKi/commet/releases/download/latest/Halley.apk). In Obtainium, keep **Include pre-releases** and **Use release date as version** on if you add the repo by hand, because the tag never changes.
+
+Upstream does not accept generative-AI contributions, so changes here stay on this fork.
 
 ## Branches
 
@@ -15,31 +20,16 @@ The upstream project README is still in [README.md](../README.md) at the reposit
 
 Feature work branches from `dev` and merges back into `dev`.
 
+## What this fork changes
+
+- Ships as **Halley** (`chat.halley.halleyapp`) with fork About branding.
+- Home visibility toggles under Appearance → Halley options (hide recent activity / rooms on Home; show rooms in the Home sidebar below Direct messages).
+- Signed release Android APKs; Check for updates points at the `latest` prerelease.
+- macOS CI keeps file-access entitlements when ad-hoc signing so attachments work.
+
 ## CI
 
-The **build** workflow:
+- **build** — signed Android / Linux / macOS / web artifacts on non-`dev` pushes, pull requests (path-filtered), tags, and manual dispatch. Successful Android builds on non-PR refs replace the [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) prerelease with `Halley.apk`.
+- **integration-test** — Linux integration suite against a local Synapse.
 
-| Trigger | Platforms |
-| --- | --- |
-| Tag created | Windows, macOS, Linux, Android, Web |
-| Push to a non-`dev` branch, PR, merge queue | Linux, Android |
-
-Pushes to `dev` do not build. Tag a commit on `dev` when you want the full matrix.
-
-Downloads are Actions artifacts (kept 90 days) on the tag’s workflow run.
-
-Artifact names include the version (tag name, or short commit sha on branches), for example `commet-linux-0.1.0-dev.4` and `commet-android-debug-0.1.0-dev.4.apk`.
-
-
-Linux artifacts vendor `libmpv` and its uncommon runtime deps into `lib/`, and launch through a small wrapper.
-
-### macOS
-
-Unzipping yields a `commet.app` bundle. Builds are ad-hoc signed; after downloading, clear Gatekeeper quarantine before opening:
-
-```bash
-unzip commet-macos-0.1.0-dev.4.zip
-xattr -cr commet.app
-open commet.app
-```
-
+Pushes to `dev` do not build. Tag a commit on `dev`, open a PR, or use workflow dispatch when you want artifacts / a refreshed `latest` APK.

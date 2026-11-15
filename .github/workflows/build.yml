@@ -285,6 +285,8 @@ jobs:
     if: github.ref != 'refs/heads/dev'
     needs: codegen
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       # Free disk without wiping hostedtoolcache (that forces a full Flutter reinstall).
       # Skip docker prune — runners rarely have useful images here and it costs ~20–40s.
@@ -396,6 +398,17 @@ jobs:
           path: ${{ steps.prepare.outputs.apk_filename }}
           archive: false
           retention-days: 90
+
+      - name: Publish latest pre-release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "${{ steps.prepare.outputs.apk_filename }}" Halley.apk
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest Halley.apk --target "$GITHUB_SHA" \
+            --prerelease --title "Latest build" \
+            --notes "Signed arm64 APK built from ${GITHUB_SHA}."
 
   build-linux:
     if: github.ref != 'refs/heads/dev'

@@ -101,8 +101,6 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
       });
     }
 
-    // showRoomsInSidebar = preferences.showRoomsInSidebar.v
-
     subs = [
       _clientManager.onSpaceChildUpdated.stream.listen((_) => onSpaceUpdate()),
       _clientManager.onSpaceUpdated.stream.listen((_) => onSpaceUpdate()),
@@ -220,6 +218,10 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                           ],
                         ),
                         context),
+                    SideNavigationBarDirectMessages(
+                      _clientManager.directMessages,
+                      onRoomTapped: widget.onDirectMessageSelected,
+                    ),
                     if (preferences.showRoomsInSidebar.value) ...[
                       SizedBox(
                         height: 4,
@@ -249,10 +251,6 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                           ),
                           context),
                     ],
-                    SideNavigationBarDirectMessages(
-                      _clientManager.directMessages,
-                      onRoomTapped: widget.onDirectMessageSelected,
-                    ),
                   ],
                 ),
                 footer: Column(
