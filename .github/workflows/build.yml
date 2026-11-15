@@ -16,20 +16,11 @@ on:
       - 'pubspec.yaml'
       - 'pubspec.lock'
       - '.github/workflows/build.yml'
-  pull_request:
-    paths:
-      - 'commet/**'
-      - 'tiamat/**'
-      - 'widgets/**'
-      - 'rust/**'
-      - 'pubspec.yaml'
-      - 'pubspec.lock'
-      - '.github/workflows/build.yml'
   merge_group:
   workflow_dispatch:
 
 concurrency:
-  group: build-${{ github.ref }}
+  group: build-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:

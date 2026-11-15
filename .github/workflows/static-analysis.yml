@@ -1,7 +1,15 @@
 name: static-analysis
 on:
-  pull_request:
+  push:
+    branches-ignore:
+      - main
+      - dev
   merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: static-analysis-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PROJECT_PATH: commet

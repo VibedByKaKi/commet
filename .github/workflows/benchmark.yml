@@ -1,9 +1,16 @@
-on: 
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
   merge_group:
-  pull_request:
   workflow_dispatch:
 
 name: benchmark
+
+concurrency:
+  group: benchmark-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
