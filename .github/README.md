@@ -29,7 +29,7 @@ Feature work branches from `dev` and merges back into `dev`.
 
 ## CI
 
-- **build** — signed Android / Linux / macOS / web artifacts on non-`dev` pushes, pull requests (path-filtered), tags, and manual dispatch. Successful Android builds on non-PR refs replace the [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) prerelease with `Halley.apk`.
-- **integration-test** — Linux integration suite against a local Synapse.
+- **build** — signed Android / Linux / macOS / web artifacts on non-`dev` pushes (path-filtered), tags, and manual dispatch. Successful Android builds replace the [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) prerelease with `Halley.apk`.
+- **integration-test** / **static-analysis** / **benchmark** — same push triggers; each uses cancel-in-progress so only the newest SHA keeps running.
 
-Pushes to `dev` do not build. Tag a commit on `dev`, open a PR, or use workflow dispatch when you want artifacts / a refreshed `latest` APK.
+Pushes to `dev` do not build. Push a feature branch, tag a commit on `dev`, or use workflow dispatch when you want artifacts / a refreshed `latest` APK.
