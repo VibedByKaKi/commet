@@ -218,10 +218,6 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                           ],
                         ),
                         context),
-                    SideNavigationBarDirectMessages(
-                      _clientManager.directMessages,
-                      onRoomTapped: widget.onDirectMessageSelected,
-                    ),
                     if (preferences.showRoomsInSidebar.value) ...[
                       SizedBox(
                         height: 4,
@@ -251,6 +247,10 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
                           ),
                           context),
                     ],
+                    SideNavigationBarDirectMessages(
+                      _clientManager.directMessages,
+                      onRoomTapped: widget.onDirectMessageSelected,
+                    ),
                   ],
                 ),
                 footer: Column(

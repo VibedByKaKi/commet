@@ -97,19 +97,28 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             "Description for enabling using collapsing of room state events in the timeline",
       );
 
-  String get labelShowRoomsInSidebar => Intl.message(
-        "Show rooms in Home sidebar",
-        name: "labelShowRoomsInSidebar",
-        desc:
-            "Label for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar",
-      );
+  String get labelShowRoomsInSidebar => Intl.message("Show rooms in sidebar",
+      name: "labelShowRoomsInSidebar",
+      desc:
+          "Label for the toggle which shows an extra entry for rooms which are not contained in a space in the sidebar");
 
   String get labelShowRoomsInSidebarDescription => Intl.message(
-        "Add an entry below Direct messages for rooms which are not contained in a space",
-        name: "labelShowRoomsInSidebarDescription",
-        desc:
-            "Description for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar",
-      );
+      "Add an entry to the sidebar that shows all rooms which are not contained in a space",
+      name: "labelShowRoomsInSidebarDescription",
+      desc:
+          "Description for the toggle which shows an extra entry for rooms which are not contained in a space in the sidebar");
+
+  String get labelShowRoomsInHomeSidebar => Intl.message(
+      "Show rooms in Home sidebar",
+      name: "labelShowRoomsInHomeSidebar",
+      desc:
+          "Label for showing non-space rooms in the Home secondary sidebar under Direct messages");
+
+  String get labelShowRoomsInHomeSidebarDescription => Intl.message(
+      "List rooms which are not contained in a space below Direct messages in the Home sidebar, with the same preview as DMs",
+      name: "labelShowRoomsInHomeSidebarDescription",
+      desc:
+          "Description for showing non-space rooms in the Home secondary sidebar under Direct messages");
 
   String get labelHideRecentActivityFromHome => Intl.message(
         "Hide recent activity from Home",
@@ -193,6 +202,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 ),
                 const Seperator(),
                 BooleanPreferenceToggle(
+                  preference: preferences.showRoomsInSidebar,
+                  title: labelShowRoomsInSidebar,
+                  description: labelShowRoomsInSidebarDescription,
+                ),
+                const Seperator(),
+                BooleanPreferenceToggle(
                   preference: preferences.showRoomAvatars,
                   title: labelUseRoomAvatars,
                   description: labelEnableRoomIconsDescription,
@@ -227,9 +242,9 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             child: Column(
               children: [
                 BooleanPreferenceToggle(
-                  preference: preferences.showRoomsInSidebar,
-                  title: labelShowRoomsInSidebar,
-                  description: labelShowRoomsInSidebarDescription,
+                  preference: preferences.showRoomsInHomeSidebar,
+                  title: labelShowRoomsInHomeSidebar,
+                  description: labelShowRoomsInHomeSidebarDescription,
                 ),
                 const Seperator(),
                 BooleanPreferenceToggle(

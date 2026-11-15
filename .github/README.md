@@ -23,7 +23,7 @@ Feature work branches from `dev` and merges back into `dev`.
 ## What this fork changes
 
 - Ships as **Halley** (`chat.halley.halleyapp`) with fork About branding.
-- Home visibility toggles under Appearance → Halley options (hide recent activity / rooms on Home; show rooms in the Home sidebar below Direct messages).
+- Home visibility toggles under Appearance → Halley Options (hide recent activity / rooms on Home; show rooms in the Home sidebar below Direct messages, with DM-style previews).
 - Signed release Android APKs; Check for updates points at the `latest` prerelease.
 - macOS CI keeps file-access entitlements when ad-hoc signing so attachments work.
 

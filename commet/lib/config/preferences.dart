@@ -405,6 +405,9 @@ class Preferences {
   BoolPreference showRoomsInSidebar =
       BoolPreference("show_rooms_in_sidebar", defaultValue: false);
 
+  BoolPreference showRoomsInHomeSidebar =
+      BoolPreference("show_rooms_in_home_sidebar", defaultValue: false);
+
   BoolPreference hideRecentActivityFromHome =
       BoolPreference("hide_recent_activity_from_home", defaultValue: false);
 
