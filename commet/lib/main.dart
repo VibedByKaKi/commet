@@ -176,8 +176,7 @@ void appMain() async {
 
     FlutterError.onError = Log.getFlutterErrorReporter(FlutterError.onError);
 
-    isHeadless =
-        PlatformUtils.isAndroid &&
+    isHeadless = PlatformUtils.isAndroid &&
         AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState;
 
     loading = initNecessary();
@@ -316,9 +315,8 @@ Future<void> startGui() async {
   if (PlatformUtils.isAndroid) {
     var roomsListCache = Map<String, List<String>>.new();
     for (var client in clientManager!.clients) {
-      roomsListCache[client.identifier] = client.rooms
-          .map((i) => i.identifier)
-          .toList();
+      roomsListCache[client.identifier] =
+          client.rooms.map((i) => i.identifier).toList();
     }
 
     preferences.storeRoomsListCache(roomsListCache);
@@ -440,17 +438,17 @@ class _AppViewState extends State<AppView> {
   @override
   void initState() {
     super.initState();
-    _onClientRemovedSubscription = widget.clientManager.onClientRemoved.stream
-        .listen((_) {
-          if (!widget.clientManager.isLoggedIn()) {
-            navigator.currentState?.popUntil((route) => route.isFirst);
-            setState(() {});
-          }
-        });
-    _onClientAddedSubscription = widget.clientManager.onClientAdded.stream
-        .listen((_) {
-          setState(() {});
-        });
+    _onClientRemovedSubscription =
+        widget.clientManager.onClientRemoved.stream.listen((_) {
+      if (!widget.clientManager.isLoggedIn()) {
+        navigator.currentState?.popUntil((route) => route.isFirst);
+        setState(() {});
+      }
+    });
+    _onClientAddedSubscription =
+        widget.clientManager.onClientAdded.stream.listen((_) {
+      setState(() {});
+    });
 
     isInitiallyLoggedIn = widget.clientManager.isLoggedIn();
   }

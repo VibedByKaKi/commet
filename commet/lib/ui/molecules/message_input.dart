@@ -108,8 +108,7 @@ class MessageInput extends StatefulWidget {
   final MessageInputSendResult Function(
     String message, {
     Client? overrideClient,
-  })?
-  onSendMessage;
+  })? onSendMessage;
   final Widget? readIndicator;
   final String? relatedEventBody;
   final String? relatedEventSenderName;
@@ -967,10 +966,10 @@ class MessageInputState extends State<MessageInput> {
                             onPressed: () async {
                               var createArgs =
                                   await AdaptiveDialog.show<PollCreateArgs>(
-                                    context,
-                                    title: "Create Poll",
-                                    builder: (context) => PollCreator(),
-                                  );
+                                context,
+                                title: "Create Poll",
+                                builder: (context) => PollCreator(),
+                              );
 
                               if (createArgs != null) {
                                 print(createArgs);
@@ -1022,7 +1021,7 @@ class MessageInputState extends State<MessageInput> {
         onTap: toggleEmojiOverlay,
         toggled: MediaQuery.of(context).mobile
             ? (emojiTooltipController.value == TooltipStatus.isShowing ||
-                  (emotePickerActive == true))
+                (emotePickerActive == true))
             : false,
       ),
     );
@@ -1382,8 +1381,8 @@ class MessageInputState extends State<MessageInput> {
               widget.interactionType == EventInteractionType.reply
                   ? Icons.keyboard_arrow_right_rounded
                   : widget.interactionType == EventInteractionType.edit
-                  ? Icons.edit
-                  : null,
+                      ? Icons.edit
+                      : null,
             ),
             tiamat.Text.name(
               widget.relatedEventSenderName!,

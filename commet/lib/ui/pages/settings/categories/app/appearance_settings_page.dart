@@ -20,118 +20,121 @@ class AppearanceSettingsPage extends StatefulWidget {
 
 class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   String get labelSettingsAppTheme => Intl.message(
-    "Theme",
-    name: "labelSettingsAppTheme",
-    desc: "Label for theme section of app appearance",
-  );
+        "Theme",
+        name: "labelSettingsAppTheme",
+        desc: "Label for theme section of app appearance",
+      );
 
   String get labelAppScale => Intl.message(
-    "App Scale",
-    name: 'labelAppScale',
-    desc:
-        "Label for the setting which controls the UI scale of the overall app",
-  );
+        "App Scale",
+        name: 'labelAppScale',
+        desc:
+            "Label for the setting which controls the UI scale of the overall app",
+      );
 
   String get labelUseRoomAvatars => Intl.message(
-    "Use room avatars",
-    name: "labelUseRoomAvatars",
-    desc: "Label for enabling using room avatars instead of icons",
-  );
+        "Use room avatars",
+        name: "labelUseRoomAvatars",
+        desc: "Label for enabling using room avatars instead of icons",
+      );
 
   String get labelEnableRoomIconsDescription => Intl.message(
-    "Show room avatar images instead of icons",
-    name: "labelEnableRoomIconsDescription",
-    desc: "Description for the enable room icons setting",
-  );
+        "Show room avatar images instead of icons",
+        name: "labelEnableRoomIconsDescription",
+        desc: "Description for the enable room icons setting",
+      );
 
   String get labelUseRoomAvatarPlaceholders => Intl.message(
-    "Use placeholder avatars",
-    name: "labelUseRoomAvatarPlaceholders",
-    desc: "Label for enabling generic icons in the appearance settings",
-  );
+        "Use placeholder avatars",
+        name: "labelUseRoomAvatarPlaceholders",
+        desc: "Label for enabling generic icons in the appearance settings",
+      );
 
   String get labelUseRoomAvatarPlaceholdersDescription => Intl.message(
-    "When a room does not have an avatar set, or using them is disabled, fallback to a generic color + first letter placeholder for the image",
-    name: "labelUseRoomAvatarPlaceholdersDescription",
-    desc: "Description for the enable generic icons setting",
-  );
+        "When a room does not have an avatar set, or using them is disabled, fallback to a generic color + first letter placeholder for the image",
+        name: "labelUseRoomAvatarPlaceholdersDescription",
+        desc: "Description for the enable generic icons setting",
+      );
 
   String get labelShowRoomPreviewsInSpaceSidebar => Intl.message(
-    "Show unjoined rooms in sidebar",
-    name: "labelShowRoomPreviewsInSpaceSidebar",
-    desc: "Label for enabling using the preview list in the space sidebar",
-  );
+        "Show unjoined rooms in sidebar",
+        name: "labelShowRoomPreviewsInSpaceSidebar",
+        desc: "Label for enabling using the preview list in the space sidebar",
+      );
 
   String get labelShowRoomPreviewsInSpaceSidebarDescription => Intl.message(
-    "When there are rooms which you have not joined in a space, show them in the sidebar with the rest of the rooms in the space",
-    name: "labelShowRoomPreviewsInSpaceSidebarDescription",
-    desc:
-        "Description for enabling using the preview list in the space sidebar",
-  );
+        "When there are rooms which you have not joined in a space, show them in the sidebar with the rest of the rooms in the space",
+        name: "labelShowRoomPreviewsInSpaceSidebarDescription",
+        desc:
+            "Description for enabling using the preview list in the space sidebar",
+      );
 
   String get labelShowRoomStateEvents => Intl.message(
-    "Show state events",
-    name: "labelShowRoomStateEvents",
-    desc: "Label for enabling visibility of state events in the room timeline",
-  );
+        "Show state events",
+        name: "labelShowRoomStateEvents",
+        desc:
+            "Label for enabling visibility of state events in the room timeline",
+      );
 
   String get labelShowRoomStateEventsDescription => Intl.message(
-    "Show changes to the room state, such as members joining and leaving, in the chat timeline",
-    name: "labelShowRoomStateEventsDescription",
-    desc:
-        "Description for enabling using visibility of room state events in the timeline",
-  );
+        "Show changes to the room state, such as members joining and leaving, in the chat timeline",
+        name: "labelShowRoomStateEventsDescription",
+        desc:
+            "Description for enabling using visibility of room state events in the timeline",
+      );
 
   String get labelCollapseStateEvents => Intl.message(
-    "Collapse state events",
-    name: "labelCollapseStateEvents",
-    desc: "Label for enabling collapsing of state events in the room timeline",
-  );
+        "Collapse state events",
+        name: "labelCollapseStateEvents",
+        desc:
+            "Label for enabling collapsing of state events in the room timeline",
+      );
 
   String get labelCollapseStateEventsDescription => Intl.message(
-    "Group changes to room state in to a single timeline event",
-    name: "labelCollapseStateEventsDescription",
-    desc:
-        "Description for enabling using collapsing of room state events in the timeline",
-  );
+        "Group changes to room state in to a single timeline event",
+        name: "labelCollapseStateEventsDescription",
+        desc:
+            "Description for enabling using collapsing of room state events in the timeline",
+      );
 
   String get labelShowRoomsInSidebar => Intl.message(
-    "Show rooms in Home sidebar",
-    name: "labelShowRoomsInSidebar",
-    desc:
-        "Label for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar",
-  );
+        "Show rooms in Home sidebar",
+        name: "labelShowRoomsInSidebar",
+        desc:
+            "Label for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar",
+      );
 
   String get labelShowRoomsInSidebarDescription => Intl.message(
-    "Add an entry below Direct messages for rooms which are not contained in a space",
-    name: "labelShowRoomsInSidebarDescription",
-    desc:
-        "Description for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar",
-  );
+        "Add an entry below Direct messages for rooms which are not contained in a space",
+        name: "labelShowRoomsInSidebarDescription",
+        desc:
+            "Description for the toggle which shows an extra entry for rooms which are not contained in a space in the Home sidebar",
+      );
 
   String get labelHideRecentActivityFromHome => Intl.message(
-    "Hide recent activity from Home",
-    name: "labelHideRecentActivityFromHome",
-    desc: "Label for hiding the recent activity panel on the Home screen",
-  );
+        "Hide recent activity from Home",
+        name: "labelHideRecentActivityFromHome",
+        desc: "Label for hiding the recent activity panel on the Home screen",
+      );
 
   String get labelHideRecentActivityFromHomeDescription => Intl.message(
-    "Remove the recent activity list from the Home screen",
-    name: "labelHideRecentActivityFromHomeDescription",
-    desc: "Description for hiding the recent activity panel on the Home screen",
-  );
+        "Remove the recent activity list from the Home screen",
+        name: "labelHideRecentActivityFromHomeDescription",
+        desc:
+            "Description for hiding the recent activity panel on the Home screen",
+      );
 
   String get labelHideRoomsFromHome => Intl.message(
-    "Hide rooms from home",
-    name: "labelHideRoomsFromHome",
-    desc: "Label for hiding the rooms list on the Home screen",
-  );
+        "Hide rooms from home",
+        name: "labelHideRoomsFromHome",
+        desc: "Label for hiding the rooms list on the Home screen",
+      );
 
   String get labelHideRoomsFromHomeDescription => Intl.message(
-    "Remove the rooms list from the Home screen",
-    name: "labelHideRoomsFromHomeDescription",
-    desc: "Description for hiding the rooms list on the Home screen",
-  );
+        "Remove the rooms list from the Home screen",
+        name: "labelHideRoomsFromHomeDescription",
+        desc: "Description for hiding the rooms list on the Home screen",
+      );
 
   @override
   void initState() {
@@ -158,8 +161,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                 onChanged: (p0) {
                   ScaledWidgetsFlutterBinding.instance.scaleFactor =
                       (deviceSize) {
-                        return p0;
-                      };
+                    return p0;
+                  };
                 },
                 title: labelAppScale,
                 description: "Resizes the overall interface of the app",
