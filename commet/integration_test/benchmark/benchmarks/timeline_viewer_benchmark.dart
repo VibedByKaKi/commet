@@ -18,9 +18,17 @@ void main() {
       ),
     ));
 
-    await tester.pump(const Duration(seconds: 1));
-
+    // Timeline is created asynchronously; wait until the viewer mounts a
+    // Scrollable before scrolling (otherwise scrollUntilVisible throws).
     final listFinder = find.byType(Scrollable);
+    final deadline = DateTime.now().add(const Duration(seconds: 15));
+    while (listFinder.evaluate().isEmpty) {
+      if (DateTime.now().isAfter(deadline)) {
+        fail('Timed out waiting for BenchmarkTimelineViewer Scrollable');
+      }
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
     final itemFinder = find.text(finalEventMessage);
 
     var reportKey = 'TimelineViewer Scrolling';
