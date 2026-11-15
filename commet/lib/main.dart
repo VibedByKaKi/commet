@@ -113,7 +113,8 @@ void bubble() async {
 
   var initialTheme = await preferences.resolveTheme();
 
-  runApp(MaterialApp(
+  runApp(
+    MaterialApp(
       title: 'Halley',
       theme: initialTheme,
       navigatorKey: navigator,
@@ -124,14 +125,16 @@ void bubble() async {
         GlobalCupertinoLocalizations.delegate,
       ],
       builder: (context, child) => Provider<ClientManager>(
-            create: (context) => clientManager!,
-            child: child,
-          ),
+        create: (context) => clientManager!,
+        child: child,
+      ),
       home: BubblePage(
         clientManager!,
         initialClientId: initialClientId,
         initialRoom: initialRoomId,
-      )));
+      ),
+    ),
+  );
 }
 
 void main(List<String> args) async {
@@ -173,7 +176,8 @@ void appMain() async {
 
     FlutterError.onError = Log.getFlutterErrorReporter(FlutterError.onError);
 
-    isHeadless = PlatformUtils.isAndroid &&
+    isHeadless =
+        PlatformUtils.isAndroid &&
         AppLifecycleState.detached == WidgetsBinding.instance.lifecycleState;
 
     loading = initNecessary();
@@ -246,8 +250,7 @@ Future<void> initGuiRequirements() async {
   MediaKit.ensureInitialized();
 
   var locale = PlatformDispatcher.instance.locale;
-  final languageCode =
-      locale.languageCode.isEmpty ? 'en' : locale.languageCode;
+  final languageCode = locale.languageCode.isEmpty ? 'en' : locale.languageCode;
 
   await Future.wait([
     UnicodeEmojis.load(),
@@ -267,6 +270,7 @@ Future<void> initGuiRequirements() async {
 
   Intl.defaultLocale = languageCode;
 }
+
 /// Initializes gui requirements and launches the gui
 Future<void> startGui() async {
   String? initialRoomId;
@@ -312,19 +316,22 @@ Future<void> startGui() async {
   if (PlatformUtils.isAndroid) {
     var roomsListCache = Map<String, List<String>>.new();
     for (var client in clientManager!.clients) {
-      roomsListCache[client.identifier] =
-          client.rooms.map((i) => i.identifier).toList();
+      roomsListCache[client.identifier] = client.rooms
+          .map((i) => i.identifier)
+          .toList();
     }
 
     preferences.storeRoomsListCache(roomsListCache);
   }
 
-  runApp(App(
-    clientManager: clientManager!,
-    initialTheme: initialTheme,
-    initialClientId: initialClientId,
-    initialRoom: initialRoomId,
-  ));
+  runApp(
+    App(
+      clientManager: clientManager!,
+      initialTheme: initialTheme,
+      initialClientId: initialClientId,
+      initialRoom: initialRoomId,
+    ),
+  );
 
   WindowManagement.init().then((_) {
     AppFocus.init();
@@ -335,23 +342,28 @@ Future<void> startGui() async {
 void enableEdgeToEdge() async {
   var theme = await preferences.resolveTheme();
   SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.edgeToEdge); // Enable Edge-to-Edge on Android 10+
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemUiMode.edgeToEdge,
+  ); // Enable Edge-to-Edge on Android 10+
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
       systemNavigationBarColor:
           Colors.transparent, // Setting a transparent navigation bar color
       systemNavigationBarContrastEnforced: true, // Default
       systemNavigationBarIconBrightness: theme.brightness == Brightness.dark
           ? Brightness.light
-          : Brightness.dark));
+          : Brightness.dark,
+    ),
+  );
 }
 
 class App extends StatelessWidget {
-  const App(
-      {super.key,
-      required this.clientManager,
-      this.initialTheme,
-      this.initialRoom,
-      this.initialClientId});
+  const App({
+    super.key,
+    required this.clientManager,
+    this.initialTheme,
+    this.initialRoom,
+    this.initialClientId,
+  });
   final ThemeData? initialTheme;
   final ClientManager clientManager;
 
@@ -365,36 +377,39 @@ class App extends StatelessWidget {
         child: FocusNodeMonitor(
           child: TextScaleChanger(
             child: ThemeChanger(
-                shouldFollowSystemTheme: () =>
-                    preferences.shouldFollowSystemTheme.value,
-                getDarkTheme: () {
-                  return preferences.resolveTheme(
-                      overrideBrightness: Brightness.dark);
-                },
-                getLightTheme: () {
-                  return preferences.resolveTheme(
-                      overrideBrightness: Brightness.light);
-                },
-                initialTheme: initialTheme ?? ThemeDark.theme,
-                materialAppBuilder: (context, theme) {
-                  return MaterialApp(
-                    title: 'Halley',
-                    theme: theme,
-                    showPerformanceOverlay:
-                        preferences.showPerformanceOverlay.value,
-                    debugShowCheckedModeBanner: false,
-                    navigatorKey: navigator,
-                    builder: (context, child) => Provider<ClientManager>(
-                      create: (context) => clientManager,
-                      child: child,
-                    ),
-                    home: AppView(
-                      clientManager: clientManager,
-                      initialClientId: initialClientId,
-                      initialRoom: initialRoom,
-                    ),
-                  );
-                }),
+              shouldFollowSystemTheme: () =>
+                  preferences.shouldFollowSystemTheme.value,
+              getDarkTheme: () {
+                return preferences.resolveTheme(
+                  overrideBrightness: Brightness.dark,
+                );
+              },
+              getLightTheme: () {
+                return preferences.resolveTheme(
+                  overrideBrightness: Brightness.light,
+                );
+              },
+              initialTheme: initialTheme ?? ThemeDark.theme,
+              materialAppBuilder: (context, theme) {
+                return MaterialApp(
+                  title: 'Halley',
+                  theme: theme,
+                  showPerformanceOverlay:
+                      preferences.showPerformanceOverlay.value,
+                  debugShowCheckedModeBanner: false,
+                  navigatorKey: navigator,
+                  builder: (context, child) => Provider<ClientManager>(
+                    create: (context) => clientManager,
+                    child: child,
+                  ),
+                  home: AppView(
+                    clientManager: clientManager,
+                    initialClientId: initialClientId,
+                    initialRoom: initialRoom,
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -403,11 +418,12 @@ class App extends StatelessWidget {
 }
 
 class AppView extends StatefulWidget {
-  const AppView(
-      {required this.clientManager,
-      super.key,
-      this.initialClientId,
-      this.initialRoom});
+  const AppView({
+    required this.clientManager,
+    super.key,
+    this.initialClientId,
+    this.initialRoom,
+  });
   final ClientManager clientManager;
   final String? initialRoom;
   final String? initialClientId;
@@ -424,17 +440,17 @@ class _AppViewState extends State<AppView> {
   @override
   void initState() {
     super.initState();
-    _onClientRemovedSubscription =
-        widget.clientManager.onClientRemoved.stream.listen((_) {
-      if (!widget.clientManager.isLoggedIn()) {
-        navigator.currentState?.popUntil((route) => route.isFirst);
-        setState(() {});
-      }
-    });
-    _onClientAddedSubscription =
-        widget.clientManager.onClientAdded.stream.listen((_) {
-      setState(() {});
-    });
+    _onClientRemovedSubscription = widget.clientManager.onClientRemoved.stream
+        .listen((_) {
+          if (!widget.clientManager.isLoggedIn()) {
+            navigator.currentState?.popUntil((route) => route.isFirst);
+            setState(() {});
+          }
+        });
+    _onClientAddedSubscription = widget.clientManager.onClientAdded.stream
+        .listen((_) {
+          setState(() {});
+        });
 
     isInitiallyLoggedIn = widget.clientManager.isLoggedIn();
   }
@@ -455,9 +471,11 @@ class _AppViewState extends State<AppView> {
             initialRoom: widget.initialRoom,
             wasLoggedInAtStartup: isInitiallyLoggedIn,
           )
-        : LoginPage(onSuccess: (_) {
-            setState(() {});
-          });
+        : LoginPage(
+            onSuccess: (_) {
+              setState(() {});
+            },
+          );
   }
 }
 

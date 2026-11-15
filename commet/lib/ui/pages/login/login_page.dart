@@ -23,23 +23,24 @@ class LoginPage extends StatefulWidget {
 
 class LoginPageState extends State<LoginPage> {
   String get messageLoginFailed => Intl.message(
-        "Login Failed...",
-        name: "messageLoginFailed",
-        desc: "Generic text to show that an attempted login has failed",
-      );
+    "Login Failed...",
+    name: "messageLoginFailed",
+    desc: "Generic text to show that an attempted login has failed",
+  );
 
   String get messageAlreadyLoggedIn => Intl.message(
-        "You have already logged in to this account",
-        name: "messageAlreadyLoggedIn",
-        desc:
-            "An error message displayed when the user attempts to add an account which has already been logged in to on this device",
-      );
+    "You have already logged in to this account",
+    name: "messageAlreadyLoggedIn",
+    desc:
+        "An error message displayed when the user attempts to add an account which has already been logged in to on this device",
+  );
 
   String get messageInvalidUsernameOrPassword => Intl.message(
-      "Invalid username or password",
-      name: "messageInvalidUsernameOrPassword",
-      desc:
-          "An error message displayed when the user attempts to log into an account using the wrong username/password combination");
+    "Invalid username or password",
+    name: "messageInvalidUsernameOrPassword",
+    desc:
+        "An error message displayed when the user attempts to log into an account using the wrong username/password combination",
+  );
 
   StreamSubscription? progressSubscription;
   double? progress;
@@ -127,9 +128,11 @@ class LoginPageState extends State<LoginPage> {
 
     if (result is LoginResultSuccess) {
       final mxid = loginClient!.self?.identifier;
-      final alreadyLoggedIn = mxid != null &&
-          (clientManager?.clients
-                  .any((client) => client.self?.identifier == mxid) ??
+      final alreadyLoggedIn =
+          mxid != null &&
+          (clientManager?.clients.any(
+                (client) => client.self?.identifier == mxid,
+              ) ??
               false);
       if (alreadyLoggedIn) {
         result = LoginResultAlreadyLoggedIn();
@@ -205,7 +208,8 @@ class LoginPageState extends State<LoginPage> {
     }
 
     final host = trimmed.split('/').first.split(':').first;
-    final isLocal = host == 'localhost' ||
+    final isLocal =
+        host == 'localhost' ||
         host == '127.0.0.1' ||
         host == '::1' ||
         RegExp(r'^\d{1,3}(\.\d{1,3}){3}$').hasMatch(host);
@@ -213,4 +217,3 @@ class LoginPageState extends State<LoginPage> {
     return isLocal ? Uri.http(trimmed) : Uri.https(trimmed);
   }
 }
-

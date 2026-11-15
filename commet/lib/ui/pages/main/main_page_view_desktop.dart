@@ -28,10 +28,10 @@ class MainPageViewDesktop extends StatelessWidget {
   final MainPageState state;
 
   String get directMessagesListHeaderDesktop => Intl.message(
-        "Direct Messages",
-        desc: "The header for the direct messages list on desktop",
-        name: "directMessagesListHeaderDesktop",
-      );
+    "Direct Messages",
+    desc: "The header for the direct messages list on desktop",
+    name: "directMessagesListHeaderDesktop",
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -89,12 +89,13 @@ class MainPageViewDesktop extends StatelessWidget {
                           ),
                           Flexible(
                             child: tiamat.Tile.surfaceContainer(
-                                caulkClipBottomLeft: true,
-                                caulkClipTopRight: true,
-                                caulkPadTop: true,
-                                caulkClipBottomRight: true,
-                                caulkClipTopLeft: true,
-                                child: buildRoomPicker(context)),
+                              caulkClipBottomLeft: true,
+                              caulkClipTopRight: true,
+                              caulkPadTop: true,
+                              caulkClipBottomRight: true,
+                              caulkClipTopLeft: true,
+                              child: buildRoomPicker(context),
+                            ),
                           ),
                         ],
                       ),
@@ -138,20 +139,18 @@ class MainPageViewDesktop extends StatelessWidget {
           SpaceHeader(
             state.currentSpace!,
             onTap: state.clearRoomSelection,
-            backgroundColor: Theme.of(
-              context,
-            ).colorScheme.surfaceContainerLow,
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
           ),
           Expanded(
             child: SingleChildScrollView(
               child: SpaceViewer(
                 state.currentSpace!,
-                key: ValueKey(
-                  "space-view-key-${state.currentSpace!.localId}",
-                ),
+                key: ValueKey("space-view-key-${state.currentSpace!.localId}"),
                 onRoomSelected: (room, {bool bypassSpecialRoomType = false}) {
-                  state.selectRoom(room,
-                      bypassSpecialRoomType: bypassSpecialRoomType);
+                  state.selectRoom(
+                    room,
+                    bypassSpecialRoomType: bypassSpecialRoomType,
+                  );
                 },
               ),
             ),
@@ -226,8 +225,10 @@ class MainPageViewDesktop extends StatelessWidget {
                   caulkClipBottomLeft: true,
                   caulkClipBottomRight: true,
                   caulkBorderLeft: true,
-                  child: RoomPrimaryView(state.currentRoom!,
-                      bypassSpecialRoomTypes: state.showAsTextRoom),
+                  child: RoomPrimaryView(
+                    state.currentRoom!,
+                    bypassSpecialRoomTypes: state.showAsTextRoom,
+                  ),
                 ),
               ),
               RoomSidePanel(
@@ -276,8 +277,9 @@ class MainPageViewDesktop extends StatelessWidget {
         child: SizedBox(
           height: double.infinity,
           child: ImportantRoomsList(
-              state: state,
-              directMessagesListHeaderDesktop: directMessagesListHeaderDesktop),
+            state: state,
+            directMessagesListHeaderDesktop: directMessagesListHeaderDesktop,
+          ),
         ),
       );
     } else {
@@ -291,7 +293,8 @@ class MainPageViewDesktop extends StatelessWidget {
         state.currentView == MainPageSubView.rooms) {
       return homeView();
     }
-    if (state.currentRoom != null && state.currentView != MainPageSubView.home) {
+    if (state.currentRoom != null &&
+        state.currentView != MainPageSubView.home) {
       return roomChatView();
     }
     if (state.currentSpace != null && state.currentRoom == null) {
@@ -306,9 +309,7 @@ class MainPageViewDesktop extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             SpaceSummary(
-              key: ValueKey(
-                "space-summary-key-${state.currentSpace!.localId}",
-              ),
+              key: ValueKey("space-summary-key-${state.currentSpace!.localId}"),
               space: state.currentSpace!,
               onRoomTap: (room) => state.selectRoom(room),
               onSpaceTap: (space) => state.selectSpace(space),

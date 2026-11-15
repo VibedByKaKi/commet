@@ -19,8 +19,11 @@ void main() {
 
     await tester.login(app);
 
-    await tester.waitFor(() => app.clientManager.isLoggedIn(),
-        timeout: const Duration(seconds: 5), skipPumpAndSettle: true);
+    await tester.waitFor(
+      () => app.clientManager.isLoggedIn(),
+      timeout: const Duration(seconds: 5),
+      skipPumpAndSettle: true,
+    );
     expect(app.clientManager.isLoggedIn(), equals(true));
 
     await app.clientManager.close();
@@ -28,8 +31,10 @@ void main() {
   });
 
   testWidgets('Test Matrix Login Invalid', (WidgetTester tester) async {
-    var hs =
-        const String.fromEnvironment('HOMESERVER', defaultValue: "localhost");
+    var hs = const String.fromEnvironment(
+      'HOMESERVER',
+      defaultValue: "localhost",
+    );
     var username = "invalidUser";
     var password = "InvalidPassword!";
 
@@ -44,8 +49,10 @@ void main() {
 
     await tester.enterText(inputs.at(0), hs);
     await tester.pumpAndSettle();
-    await tester.waitFor(() => find.byType(TextField).evaluate().length >= 3,
-        timeout: const Duration(seconds: 15));
+    await tester.waitFor(
+      () => find.byType(TextField).evaluate().length >= 3,
+      timeout: const Duration(seconds: 15),
+    );
     inputs = find.byType(TextField);
     await tester.enterText(inputs.at(1), username);
     await tester.pumpAndSettle();
@@ -57,9 +64,10 @@ void main() {
     await tester.tap(button);
     // Failures surface as an AdaptiveDialog titled "Login failed".
     await tester.waitFor(
-        () => find.text("Login failed").evaluate().isNotEmpty,
-        skipPumpAndSettle: false,
-        timeout: const Duration(seconds: 15));
+      () => find.text("Login failed").evaluate().isNotEmpty,
+      skipPumpAndSettle: false,
+      timeout: const Duration(seconds: 15),
+    );
     await tester.pumpFrames(app, const Duration(seconds: 1));
     expect(app.clientManager.isLoggedIn(), equals(false));
 
