@@ -70,11 +70,12 @@ extension BenchmarkUtils on MatrixClient {
 extension BenchmarkTimeline on MatrixRoom {
   MatrixTimeline getBenchmarkTimeline() {
     int count = 500;
+    // Matrix timelines treat events[0] as newest; put the marker there so the
+    // reverse timeline shows it near the initial viewport.
     var chunk = c.TimelineChunk(events: [
-      for (var i = 0; i < count; i++) createRandomEvent(i, count),
-      createTestEndEvent(count),
-
-      // create more events so it doent try to fetch more from server
+      createTestEndEvent(0),
+      for (var i = 0; i < count; i++) createRandomEvent(i + 1, count),
+      // Extra older events so history loading is not attempted immediately.
       for (var i = 0; i < 50; i++) createRandomEvent(count + 1 + i, count),
     ]);
 

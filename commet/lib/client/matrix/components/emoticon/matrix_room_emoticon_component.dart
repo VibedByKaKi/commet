@@ -156,7 +156,9 @@ class MatrixRoomEmoticonComponent extends MatrixEmoticonComponent
           .addAll(globalComponent.ownedPacks.where((e) => !result.contains(e)));
     }
 
-    if (includeUnicode) result.addAll(UnicodeEmojis.packs!);
+    if (includeUnicode) {
+      result.addAll(UnicodeEmojis.packs ?? const []);
+    }
 
     return result;
   }
