@@ -364,11 +364,19 @@ jobs:
           cd $PROJECT_PATH
           flutter pub get
 
+      - name: Setup Signatures
+        run: |
+          cd $PROJECT_PATH
+          dart run scripts/setup_android_release.dart \
+            --key_password ${{ secrets.ANDROID_KEY_PASSWORD }} \
+            --key_b64 ${{ secrets.ANDROID_KEY_STORE_B64 }} \
+            --key_alias ${{ secrets.ANDROID_KEY_ALIAS || 'key' }}
+
       # arm64-only: fat multi-ABI APKs dominated the ~10m Build APK step.
       - name: Build APK
         run: |
           cd $PROJECT_PATH
-          flutter build apk --debug --target-platform=android-arm64 \
+          flutter build apk --release --target-platform=android-arm64 \
             --dart-define PLATFORM=android \
             --dart-define VERSION_TAG=${{ steps.meta.outputs.version_tag }} \
             --dart-define GIT_HASH=${{ steps.meta.outputs.git_hash }} \
@@ -378,8 +386,8 @@ jobs:
       - name: Prepare APK for upload
         id: prepare
         run: |
-          DEST="commet-android-debug-arm64-${{ steps.meta.outputs.version }}.apk"
-          cp "$PROJECT_PATH/build/app/outputs/flutter-apk/app-debug.apk" "$DEST"
+          DEST="commet-android-arm64-${{ steps.meta.outputs.version }}.apk"
+          cp "$PROJECT_PATH/build/app/outputs/flutter-apk/app-release.apk" "$DEST"
           echo "apk_filename=${DEST}" >> "$GITHUB_OUTPUT"
 
       - name: Upload Artifact
