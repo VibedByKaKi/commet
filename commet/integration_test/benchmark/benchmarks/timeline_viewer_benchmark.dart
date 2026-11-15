@@ -35,13 +35,19 @@ void main() {
 
     await binding.traceAction(
       () async {
-        // Scroll until the item to be found appears.
-        await tester.scrollUntilVisible(
-          itemFinder,
-          50.0,
-          maxScrolls: 10000,
-          scrollable: listFinder,
-        );
+        // Timeline uses reverse:true; try the natural direction first with a
+        // limited budget, then the opposite if needed.
+        Future<void> scroll(double delta) => tester.scrollUntilVisible(
+              itemFinder,
+              delta,
+              maxScrolls: 2000,
+              scrollable: listFinder,
+            );
+        try {
+          await scroll(-50.0);
+        } catch (_) {
+          await scroll(50.0);
+        }
       },
       reportKey: reportKey,
     );

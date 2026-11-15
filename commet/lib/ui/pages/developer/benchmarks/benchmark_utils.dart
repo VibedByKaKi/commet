@@ -9,14 +9,19 @@ import 'package:matrix/matrix.dart' as matrix;
 // ignore: implementation_imports
 import 'package:matrix/src/models/timeline_chunk.dart' as c;
 
-const _userId = "@benchy:example.com";
+const benchmarkUserId = "@benchy:example.com";
 const _roomId = "!benchmark:example.com";
 const finalEventMessage = "End Test Here";
 
 extension BenchmarkUtils on MatrixClient {
   MatrixRoom createRoomWithData() {
+    // Timeline event menus call room.canRedact → ownPowerLevel → client.userID!
+    final mx = getMatrixClient();
+    mx.setUserId(benchmarkUserId);
+
     var mxRoom = matrix.Room.fromJson({
       'id': _roomId,
+      'membership': 'join',
       'notification_count': 0,
       'highlight_count': 0,
       'prev_batch': 'fake_batch_id',
@@ -24,16 +29,39 @@ extension BenchmarkUtils on MatrixClient {
         'm.joined_member_count': 100,
         'm.invited_member_count': 0,
       },
-    }, getMatrixClient());
+    }, mx);
+
+    mxRoom.setState(matrix.Event.fromJson({
+      'type': 'm.room.create',
+      'state_key': '',
+      'sender': benchmarkUserId,
+      'content': {'creator': benchmarkUserId, 'room_version': '10'},
+    }, mxRoom));
 
     mxRoom.setState(matrix.Event.fromJson({
       'type': 'm.room.member',
-      'state_key': _userId,
-      'sender': _userId,
-      'content': {'display_name': 'Benchy', 'membership': 'join'}
+      'state_key': benchmarkUserId,
+      'sender': benchmarkUserId,
+      'content': {'displayname': 'Benchy', 'membership': 'join'}
     }, mxRoom));
 
-    var room = MatrixRoom(this, mxRoom, getMatrixClient());
+    mxRoom.setState(matrix.Event.fromJson({
+      'type': 'm.room.power_levels',
+      'state_key': '',
+      'sender': benchmarkUserId,
+      'content': {
+        'users': {benchmarkUserId: 100},
+        'users_default': 0,
+        'events_default': 0,
+        'state_default': 50,
+        'ban': 50,
+        'kick': 50,
+        'redact': 50,
+        'invite': 50,
+      },
+    }, mxRoom));
+
+    var room = MatrixRoom(this, mxRoom, mx);
     rooms.add(room);
     return room;
   }
@@ -61,7 +89,7 @@ extension BenchmarkTimeline on MatrixRoom {
       'event_id': '\$final',
       'type': 'm.room.message',
       'content': {'body': finalEventMessage, 'msgtype': 'm.text'},
-      'sender': _userId,
+      'sender': benchmarkUserId,
       'room_id': matrixRoom.id,
       'origin_server_ts': DateTime.now()
           .subtract(Duration(days: eventCount))
@@ -79,7 +107,7 @@ extension BenchmarkTimeline on MatrixRoom {
 
     var json = {
       'event_id': '\$$seed',
-      'sender': _userId,
+      'sender': benchmarkUserId,
       'room_id': matrixRoom.id,
       'origin_server_ts':
           DateTime.now().subtract(Duration(days: seed)).millisecondsSinceEpoch
@@ -118,7 +146,7 @@ extension BenchmarkTimeline on MatrixRoom {
               'm.in_reply_to': {'event_id': relatedEventId}
           },
       },
-      'sender': _userId,
+      'sender': benchmarkUserId,
       'room_id': matrixRoom.id,
       'origin_server_ts':
           DateTime.now().subtract(Duration(days: seed)).millisecondsSinceEpoch
