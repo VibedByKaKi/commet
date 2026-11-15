@@ -1,4 +1,4 @@
-package chat.commet.commetapp
+package chat.halley.halleyapp
 
 import android.annotation.SuppressLint
 import android.app.Activity

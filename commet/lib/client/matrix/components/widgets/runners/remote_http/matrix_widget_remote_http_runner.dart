@@ -117,7 +117,7 @@ class MatrixUserWidgetRemoteHttpRunner implements MatrixWidgetRunner {
       navigator.currentContext!,
       () async {
         var tempDir = await getTemporaryDirectory();
-        var temp = p.join(tempDir.path, "chat.commet.app", "widget_runner");
+        var temp = p.join(tempDir.path, "chat.halley.app", "widget_runner");
 
         Log.i("Launching chrome with temp location: $temp");
 

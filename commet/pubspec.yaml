@@ -266,7 +266,7 @@ flutter:
 
 msix_config: 
   display_name: Halley
-  identity_name: chat.commet.app.windows-a33bc9ba
+  identity_name: chat.halley.app.windows-a33bc9ba
   msix_version: 1.0.4.0
   protocol_activation: commetchat
   toast_activator: 

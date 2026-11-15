@@ -49,7 +49,7 @@ class LinuxNotifier implements Notifier {
   late LinuxServerCapabilities capabilities;
 
   final service = LauncherEntryService(
-      appUri: 'application://chat.commet.commetapp.desktop');
+      appUri: 'application://chat.halley.halleyapp.desktop');
 
   static void notificationResponse(NotificationResponse details) {
     final payload = jsonDecode(details.payload!) as Map<String, dynamic>;
@@ -225,7 +225,7 @@ class LinuxNotifier implements Notifier {
       ],
       customHints: [
         notif.LinuxNotificationCustomHint('desktop-entry',
-            notif.LinuxHintStringValue("chat.commet.commetapp")),
+            notif.LinuxHintStringValue("chat.halley.halleyapp")),
       ],
       category: LinuxNotificationCategory.imReceived,
     );

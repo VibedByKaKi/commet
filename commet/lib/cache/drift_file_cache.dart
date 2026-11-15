@@ -36,7 +36,7 @@ class DriftFileCacheDatabase extends _$DriftFileCacheDatabase {
 class DriftFileCache implements FileCache {
   DriftFileCacheDatabase? database;
 
-  static const String isolateName = "chat.commet.commetapp.isolate.file_cache";
+  static const String isolateName = "chat.halley.halleyapp.isolate.file_cache";
 
   @override
   Future<void> clean() async {
@@ -136,7 +136,7 @@ class DriftFileCache implements FileCache {
   @override
   Future<void> init() async {
     var tempDir = await getTemporaryDirectory();
-    var temp = p.join(tempDir.path, "chat.commet.app", "file_cache");
+    var temp = p.join(tempDir.path, "chat.halley.app", "file_cache");
 
     Log.i("Cache: $temp");
 
@@ -183,7 +183,7 @@ class DriftFileCache implements FileCache {
   Future<String> newPath() async {
     final dir = await getTemporaryDirectory();
     String fileName = RandomUtils.getRandomString(30);
-    return p.join(dir.path, "chat.commet.app", "file_cache", fileName);
+    return p.join(dir.path, "chat.halley.app", "file_cache", fileName);
   }
 
   Future<String> generateTempFilePath() async {

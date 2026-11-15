@@ -9,10 +9,10 @@ set(BINARY_NAME "commet")
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
 
 if ($ENV{COMMET_PROD} MATCHES "1")
-  set(APPLICATION_ID "chat.commet.commetapp")
+  set(APPLICATION_ID "chat.halley.halleyapp")
   message("Building in PRODUCTION mode")
 else()
-  set(APPLICATION_ID "chat.commet.commetapp.develop")
+  set(APPLICATION_ID "chat.halley.halleyapp.develop")
   message("Building in DEVELOP mode")
 endif()
 

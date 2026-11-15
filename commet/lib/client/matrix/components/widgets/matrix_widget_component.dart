@@ -343,7 +343,7 @@ class MatrixWidgetComponent implements WidgetComponent<MatrixClient> {
     Log.i("Server socket path: ${receiveSocketPath}");
     Log.i("Opened socket: ${server}");
 
-    const platform = const MethodChannel('chat.commet.commetapp/utils');
+    const platform = const MethodChannel('chat.halley.halleyapp/utils');
 
     await platform.invokeMethod<bool>("openWidgetWindow", {
       "url": url,

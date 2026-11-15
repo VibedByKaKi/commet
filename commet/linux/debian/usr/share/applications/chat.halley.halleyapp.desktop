@@ -1,10 +1,10 @@
 [Desktop Entry]
 Name=Halley
-Exec=/usr/lib/chat.commet.commetapp/commet %U
+Exec=/usr/lib/chat.halley.halleyapp/commet %U
 Terminal=false
 Type=Application
 Icon=commet-desktop
-StartupWMClass=Commet
+StartupWMClass=Halley
 Comment=Halley is a Commet
 Categories=Network;InstantMessaging;Chat;
 MimeType=x-scheme-handler/commetchat;

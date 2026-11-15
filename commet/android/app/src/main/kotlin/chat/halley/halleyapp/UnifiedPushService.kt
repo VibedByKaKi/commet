@@ -1,4 +1,4 @@
-package chat.commet.commetapp
+package chat.halley.halleyapp
 
 import android.content.Context
 import android.util.Log

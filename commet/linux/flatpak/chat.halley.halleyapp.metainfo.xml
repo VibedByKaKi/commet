@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>chat.commet.commetapp</id>
+  <id>chat.halley.halleyapp</id>
   <name>Halley</name>
   <summary>Halley is a Commet</summary>
   <developer_name>Airyz</developer_name>
@@ -16,7 +16,7 @@
   <description>
     <p>Halley is a Commet — a Matrix client focused on a feature-rich experience with a simple interface.</p>
   </description>
-  <launchable type="desktop-id">chat.commet.commetapp.desktop</launchable>
+  <launchable type="desktop-id">chat.halley.halleyapp.desktop</launchable>
   <content_rating type="oars-1.1" />
   <releases>
     <release version="{{VERSION_TAG}}" />

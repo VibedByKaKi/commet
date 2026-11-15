@@ -48,7 +48,7 @@ int shortcuts_main(
         return -1;
     }
 
-    dbus_msg = ::dbus_message_new_method_call("chat.commet.commetapp", "/chat/commet/commetapp/Shortcuts", "chat.commet.commetapp.Shortcuts", argv[2]);
+    dbus_msg = ::dbus_message_new_method_call("chat.halley.halleyapp", "/chat/halley/halleyapp/Shortcuts", "chat.halley.halleyapp.Shortcuts", argv[2]);
 
     if (dbus_msg == nullptr)
     {

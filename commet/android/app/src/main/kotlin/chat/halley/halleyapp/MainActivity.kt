@@ -1,4 +1,4 @@
-package chat.commet.commetapp
+package chat.halley.halleyapp
 
 import android.app.Activity
 import android.content.ComponentName
@@ -55,7 +55,7 @@ class BubbleActivity : BaseActivity() {
 }
 
 fun registerMethods(flutterEngine: FlutterEngine, activity: Activity) {
-    MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "chat.commet.commetapp/utils").apply {
+    MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "chat.halley.halleyapp/utils").apply {
         setMethodCallHandler { call, result ->
             if(call.method == "dismissKeyboard") {
                 hideKeyboard(activity);

@@ -297,7 +297,7 @@ jobs:
         run: | 
           mv $PROJECT_PATH/linux/debian/DEBIAN/control-${{ matrix.os }} $PROJECT_PATH/linux/debian/DEBIAN/control
           cp -r $PROJECT_PATH/linux/debian ./commet-pkg
-          cp -r $PROJECT_PATH/build/linux/x64/release/bundle ./commet-pkg/usr/lib/chat.commet.commetapp
+          cp -r $PROJECT_PATH/build/linux/x64/release/bundle ./commet-pkg/usr/lib/chat.halley.halleyapp
           version=$(echo ${{ github.event.release.tag_name || 'v0.0.0-artifact' }} | grep -oP '[0-9]+([.][0-9]+)+')
           echo $version
           cd ./commet-pkg
@@ -388,10 +388,10 @@ jobs:
           version=$(echo ${{ github.event.release.tag_name || 'v0.0.0-artifact' }} | grep -oP '[0-9]+([.][0-9]+)+')
           echo $version
           cd $PROJECT_PATH/linux/flatpak
-          sed -i "s/{{VERSION_TAG}}/$version/g" ./chat.commet.commetapp.desktop
-          sed -i "s/{{VERSION_TAG}}/$version/g" ./chat.commet.commetapp.metainfo.xml
-          flatpak-builder --force-clean build-dir chat.commet.commetapp.yaml --repo=repo
-          flatpak build-bundle repo chat.commet.commetapp.flatpak chat.commet.commetapp
+          sed -i "s/{{VERSION_TAG}}/$version/g" ./chat.halley.halleyapp.desktop
+          sed -i "s/{{VERSION_TAG}}/$version/g" ./chat.halley.halleyapp.metainfo.xml
+          flatpak-builder --force-clean build-dir chat.halley.halleyapp.yaml --repo=repo
+          flatpak build-bundle repo chat.halley.halleyapp.flatpak chat.halley.halleyapp
       
       - name: Upload to release
         if: github.event_name == 'release'
@@ -400,16 +400,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: commet/linux/flatpak/chat.commet.commetapp.flatpak
-          asset_name: chat.commet.commetapp.flatpak
+          asset_path: commet/linux/flatpak/chat.halley.halleyapp.flatpak
+          asset_name: chat.halley.halleyapp.flatpak
           asset_content_type: application/octet-stream
 
       - name: Upload Artifact
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: chat.commet.commetapp.flatpak
-          path: commet/linux/flatpak/chat.commet.commetapp.flatpak
+          name: chat.halley.halleyapp.flatpak
+          path: commet/linux/flatpak/chat.halley.halleyapp.flatpak
 
   release-linux-portable:
     runs-on: ubuntu-latest

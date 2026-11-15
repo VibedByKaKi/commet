@@ -2,8 +2,8 @@ import 'package:commet/utils/system_wide_shortcuts/system_wide_shortcuts.dart';
 import 'package:dbus/dbus.dart';
 
 // for testing:
-// gdbus call --session --dest chat.commet.commetapp --object-path /chat/commet/commetapp/Shortcuts --method chat.commet.commetapp.Shortcuts.unmute
-// gdbus call --session --dest chat.commet.commetapp --object-path /chat/commet/commetapp/Shortcuts --method chat.commet.commetapp.Shortcuts.mute
+// gdbus call --session --dest chat.halley.halleyapp --object-path /chat/halley/halleyapp/Shortcuts --method chat.halley.halleyapp.Shortcuts.unmute
+// gdbus call --session --dest chat.halley.halleyapp --object-path /chat/halley/halleyapp/Shortcuts --method chat.halley.halleyapp.Shortcuts.mute
 
 class SystemWideShortcutsLinux {
   static Future<void> init() async {
@@ -12,17 +12,17 @@ class SystemWideShortcutsLinux {
 
   static Future<void> initDbus() async {
     var client = DBusClient.session();
-    await client.requestName('chat.commet.commetapp');
+    await client.requestName('chat.halley.halleyapp');
     await client.registerObject(TestObject());
   }
 }
 
 class TestObject extends DBusObject {
-  TestObject() : super(DBusObjectPath('/chat/commet/commetapp/Shortcuts'));
+  TestObject() : super(DBusObjectPath('/chat/halley/halleyapp/Shortcuts'));
 
   @override
   Future<DBusMethodResponse> getProperty(String interface, String name) async {
-    if (interface == 'chat.commet.commetapp.shortcuts' && name == 'Version') {
+    if (interface == 'chat.halley.halleyapp.shortcuts' && name == 'Version') {
       return DBusGetPropertyResponse(DBusString('1.0'));
     } else {
       return DBusMethodErrorResponse.unknownProperty();
@@ -33,7 +33,7 @@ class TestObject extends DBusObject {
   Future<DBusMethodResponse> handleMethodCall(DBusMethodCall methodCall) async {
     print("Handling dbus message call!");
     print(methodCall.toString());
-    if (methodCall.interface != "chat.commet.commetapp.Shortcuts") {
+    if (methodCall.interface != "chat.halley.halleyapp.Shortcuts") {
       return DBusMethodErrorResponse.unknownInterface();
     }
 

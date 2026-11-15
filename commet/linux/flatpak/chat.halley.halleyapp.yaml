@@ -1,4 +1,4 @@
-app-id: chat.commet.commetapp
+app-id: chat.halley.halleyapp
 runtime: org.gnome.Platform
 runtime-version: '51'
 sdk: org.gnome.Sdk
@@ -129,9 +129,9 @@ modules:
   - mkdir -p /app/lib/ffmpeg
   - cp -r bundle /app/commet
   - chmod +x /app/commet/bundle/commet
-  - install -Dm644 chat.commet.commetapp.metainfo.xml /app/share/appdata/chat.commet.commetapp.appdata.xml
-  - install -Dm644 icon.png /app/share/icons/hicolor/512x512/apps/chat.commet.commetapp.png
-  - install -Dm644 chat.commet.commetapp.desktop /app/share/applications/chat.commet.commetapp.desktop
+  - install -Dm644 chat.halley.halleyapp.metainfo.xml /app/share/appdata/chat.halley.halleyapp.appdata.xml
+  - install -Dm644 icon.png /app/share/icons/hicolor/512x512/apps/chat.halley.halleyapp.png
+  - install -Dm644 chat.halley.halleyapp.desktop /app/share/applications/chat.halley.halleyapp.desktop
   - mkdir -p /app/bin
   - ls /app/lib64
   - cp -a /app/lib64/. /app/lib/
@@ -139,9 +139,9 @@ modules:
   - type: dir
     path: commet
   - type: file
-    path: chat.commet.commetapp.desktop
+    path: chat.halley.halleyapp.desktop
   - type: file
-    path: chat.commet.commetapp.metainfo.xml
+    path: chat.halley.halleyapp.metainfo.xml
   - type: file
     path: icon.png
   - type: script
