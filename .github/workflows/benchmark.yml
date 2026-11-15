@@ -71,6 +71,8 @@ jobs:
 
 
       - name: Store benchmark result - separate results repo
+        # Fork runs often lack write access to the upstream results repo.
+        continue-on-error: true
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: Benchmark
