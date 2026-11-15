@@ -46,22 +46,35 @@ void main() {
 
     await binding.traceAction(
       () async {
-        if (itemFinder.evaluate().isNotEmpty) {
-          await tester.ensureVisible(itemFinder);
-          return;
+        // Always generate scroll frames for the timeline driver summary,
+        // even when the marker is already in view.
+        final scrollable = listFinder;
+        for (var i = 0; i < 40; i++) {
+          await tester.fling(scrollable, const Offset(0, -300), 1000);
+          await tester.pump(const Duration(milliseconds: 16));
         }
-        // Timeline uses reverse:true; try both directions with a tight budget.
-        Future<void> scroll(double delta) => tester.scrollUntilVisible(
+        for (var i = 0; i < 40; i++) {
+          await tester.fling(scrollable, const Offset(0, 300), 1000);
+          await tester.pump(const Duration(milliseconds: 16));
+        }
+        if (itemFinder.evaluate().isEmpty) {
+          try {
+            await tester.scrollUntilVisible(
               itemFinder,
-              delta,
+              -50.0,
               maxScrolls: 500,
-              scrollable: listFinder,
+              scrollable: scrollable,
             );
-        try {
-          await scroll(-50.0);
-        } catch (_) {
-          await scroll(50.0);
+          } catch (_) {
+            await tester.scrollUntilVisible(
+              itemFinder,
+              50.0,
+              maxScrolls: 500,
+              scrollable: scrollable,
+            );
+          }
         }
+        expect(itemFinder, findsWidgets);
       },
       reportKey: reportKey,
     );
