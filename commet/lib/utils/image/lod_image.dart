@@ -141,20 +141,34 @@ class LODImageCompleter extends ImageStreamCompleter {
         autoLoadFullres &&
         hasCachedFullres != null &&
         await (hasCachedFullres!.call()) == true) {
-      _loadFullRes();
+      await _loadFullRes();
+      _reportIfStillEmpty();
       return;
     }
 
     if (loadThumbnail != null &&
         hasCachedThumbnail != null &&
         await (hasCachedThumbnail!.call()) == true) {
-      _loadThumbnail();
+      await _loadThumbnail();
+      _reportIfStillEmpty();
       return;
     }
 
-    if (blurhash != null) _loadBlurhash();
-    if (loadThumbnail != null) _loadThumbnail();
-    if (loadFullRes != null && autoLoadFullres) _loadFullRes();
+    if (blurhash != null) await _loadBlurhash();
+    await Future.wait([
+      if (loadThumbnail != null) _loadThumbnail(),
+      if (loadFullRes != null && autoLoadFullres) _loadFullRes(),
+    ]);
+    _reportIfStillEmpty();
+  }
+
+  void _reportIfStillEmpty() {
+    if (currentlyLoadedImage != null) return;
+    reportError(
+      exception: StateError('LOD image failed to load any frame'),
+      stack: StackTrace.current,
+      silent: true,
+    );
   }
 
   Future<void> _loadBlurhash() async {
@@ -175,19 +189,23 @@ class LODImageCompleter extends ImageStreamCompleter {
     if (currentlyLoadedImage == LODImageType.fullres) return;
 
     thumbnailLoading = () async {
-      var bytes = await loadThumbnail!.call();
-      if (bytes == null) return;
+      try {
+        var bytes = await loadThumbnail!.call();
+        if (bytes == null) return;
 
-      mimeType = Mime.lookupType("", data: bytes);
+        mimeType = Mime.lookupType("", data: bytes);
 
-      var codec = await callback(
-        await ImmutableBuffer.fromUint8List(bytes),
-        getTargetSize: (intrinsicWidth, intrinsicHeight) {
-          return TargetImageSize(height: thumbnailHeight);
-        },
-      );
+        var codec = await callback(
+          await ImmutableBuffer.fromUint8List(bytes),
+          getTargetSize: (intrinsicWidth, intrinsicHeight) {
+            return TargetImageSize(height: thumbnailHeight);
+          },
+        );
 
-      await _setCodec(LODImageType.thumbnail, codec);
+        await _setCodec(LODImageType.thumbnail, codec);
+      } catch (error, stack) {
+        reportError(exception: error, stack: stack, silent: true);
+      }
     }();
 
     await thumbnailLoading;
@@ -217,18 +235,22 @@ class LODImageCompleter extends ImageStreamCompleter {
     }
 
     fullResLoading = () async {
-      var bytes = await loadFullRes!.call();
-      if (bytes == null) return;
+      try {
+        var bytes = await loadFullRes!.call();
+        if (bytes == null) return;
 
-      mimeType = Mime.lookupType("", data: bytes);
-      var codec = await callback(
-        await ImmutableBuffer.fromUint8List(bytes),
-        getTargetSize: (intrinsicWidth, intrinsicHeight) {
-          return TargetImageSize(height: fullResHeight);
-        },
-      );
+        mimeType = Mime.lookupType("", data: bytes);
+        var codec = await callback(
+          await ImmutableBuffer.fromUint8List(bytes),
+          getTargetSize: (intrinsicWidth, intrinsicHeight) {
+            return TargetImageSize(height: fullResHeight);
+          },
+        );
 
-      await _setCodec(LODImageType.fullres, codec);
+        await _setCodec(LODImageType.fullres, codec);
+      } catch (error, stack) {
+        reportError(exception: error, stack: stack, silent: true);
+      }
     }();
 
     await fullResLoading;

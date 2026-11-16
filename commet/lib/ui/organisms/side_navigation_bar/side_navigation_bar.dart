@@ -101,8 +101,6 @@ class _SideNavigationBarState extends State<SideNavigationBar> {
       });
     }
 
-    // showRoomsInSidebar = preferences.showRoomsInSidebar.v
-
     subs = [
       _clientManager.onSpaceChildUpdated.stream.listen((_) => onSpaceUpdate()),
       _clientManager.onSpaceUpdated.stream.listen((_) => onSpaceUpdate()),

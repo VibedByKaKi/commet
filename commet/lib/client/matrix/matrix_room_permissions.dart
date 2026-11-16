@@ -33,7 +33,8 @@ class MatrixRoomPermissions extends Permissions {
   bool get canEditRoomEmoticons => room.canSendDefaultStates;
 
   @override
-  bool get canDeleteOtherUserMessages => room.canRedact;
+  bool get canDeleteOtherUserMessages =>
+      room.client.userID != null && room.canRedact;
 
   @override
   bool get canEditChildren =>

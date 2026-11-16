@@ -5,9 +5,14 @@ on:
       - dev
     tags-ignore:
       - '**'
-  pull_request:
+  merge_group:
+  workflow_dispatch:
+
 name: integration-test
 
+concurrency:
+  group: integration-test-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   HOMESERVER: localhost

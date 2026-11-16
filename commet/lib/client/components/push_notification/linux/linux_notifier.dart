@@ -49,7 +49,8 @@ class LinuxNotifier implements Notifier {
   late LinuxServerCapabilities capabilities;
 
   final service = LauncherEntryService(
-      appUri: 'application://chat.halley.halleyapp.desktop');
+    appUri: 'application://chat.halley.halleyapp.desktop',
+  );
 
   static void notificationResponse(NotificationResponse details) {
     final payload = jsonDecode(details.payload!) as Map<String, dynamic>;
@@ -91,7 +92,8 @@ class LinuxNotifier implements Notifier {
       final clientId = payload['client_id'];
       final session = clientManager?.callManager.currentSessions
           .where(
-              (e) => e.sessionId == callId && e.client.identifier == clientId)
+            (e) => e.sessionId == callId && e.client.identifier == clientId,
+          )
           .firstOrNull;
 
       if (action == callDecline) {
@@ -138,19 +140,20 @@ class LinuxNotifier implements Notifier {
           LinuxInitializationSettings(defaultActionName: 'Open notification');
 
       await flutterLocalNotificationsPlugin?.initialize(
-          initializationSettingsLinux,
-          onDidReceiveNotificationResponse: notificationResponse);
+        initializationSettingsLinux,
+        onDidReceiveNotificationResponse: notificationResponse,
+      );
 
-      capabilities =
-          await flutterLocalNotificationsPlugin!.getCapabilities();
+      capabilities = await flutterLocalNotificationsPlugin!.getCapabilities();
     } catch (e, s) {
       Log.w("Linux notification daemon unavailable: $e\n$s");
       capabilities = fallbackCapabilities;
       flutterLocalNotificationsPlugin = null;
     }
 
-    clientManager!.directMessages.highlightedRoomsList.onListUpdated
-        .listen((_) => updateBadgeCount());
+    clientManager!.directMessages.highlightedRoomsList.onListUpdated.listen(
+      (_) => updateBadgeCount(),
+    );
     clientManager!.onSpaceUpdated.stream.listen((_) => updateBadgeCount());
 
     updateBadgeCount();
@@ -180,7 +183,8 @@ class LinuxNotifier implements Notifier {
   }
 
   Future<void> displayMessageNotification(
-      MessageNotificationContent content) async {
+    MessageNotificationContent content,
+  ) async {
     var client = clientManager?.getClient(content.clientId);
     var room = client?.getRoom(content.roomId);
 
@@ -189,19 +193,21 @@ class LinuxNotifier implements Notifier {
     }
 
     var image = await ShortcutsManager.createAvatarImage(
-        placeholderColor: room.getColorOfUser(content.senderId),
-        placeholderText: content.senderName,
-        imageProvider: content.senderImage,
-        doCircleMask: true,
-        shouldZoomOut: false);
+      placeholderColor: room.getColorOfUser(content.senderId),
+      placeholderText: content.senderName,
+      imageProvider: content.senderImage,
+      doCircleMask: true,
+      shouldZoomOut: false,
+    );
 
     if (content.isDirectMessage == false) {
       var roomImage = await ShortcutsManager.createAvatarImage(
-          placeholderColor: room.defaultColor,
-          placeholderText: room.displayName,
-          imageProvider: content.roomImage,
-          doCircleMask: true,
-          shouldZoomOut: false);
+        placeholderColor: room.defaultColor,
+        placeholderText: room.displayName,
+        imageProvider: content.roomImage,
+        doCircleMask: true,
+        shouldZoomOut: false,
+      );
 
       image = await ShortcutsManager.combineRoomAndUserImages(roomImage, image);
     }
@@ -212,20 +218,25 @@ class LinuxNotifier implements Notifier {
     String notificationBody = content.content;
 
     var details = LinuxNotificationDetails(
-      icon: ByteDataLinuxIcon(LinuxRawIconData(
+      icon: ByteDataLinuxIcon(
+        LinuxRawIconData(
           data: data,
           width: image.width,
           height: image.height,
           hasAlpha: true,
-          channels: 4)),
+          channels: 4,
+        ),
+      ),
       defaultActionName: openRoom,
       actions: [
         if (capabilities.otherCapabilities.contains("inline-reply"))
-          LinuxNotificationAction(key: "inline-reply", label: "Reply")
+          LinuxNotificationAction(key: "inline-reply", label: "Reply"),
       ],
       customHints: [
-        notif.LinuxNotificationCustomHint('desktop-entry',
-            notif.LinuxHintStringValue("chat.halley.halleyapp")),
+        notif.LinuxNotificationCustomHint(
+          'desktop-entry',
+          notif.LinuxHintStringValue("chat.halley.halleyapp"),
+        ),
       ],
       category: LinuxNotificationCategory.imReceived,
     );
@@ -249,8 +260,12 @@ class LinuxNotifier implements Notifier {
     player.open(Media("asset:///assets/sound/message.ogg"));
 
     flutterLocalNotificationsPlugin?.show(
-        notificationId++, title, notificationBody,
-        notificationDetails: details, payload: jsonEncode(payload));
+      notificationId++,
+      title,
+      notificationBody,
+      notificationDetails: details,
+      payload: jsonEncode(payload),
+    );
   }
 
   Future<void> displayCallNotification(CallNotificationContent content) async {
@@ -262,32 +277,41 @@ class LinuxNotifier implements Notifier {
     }
 
     var image = await ShortcutsManager.createAvatarImage(
-        placeholderColor: room.getColorOfUser(content.senderId),
-        placeholderText: content.roomName,
-        imageProvider: content.senderImage,
-        doCircleMask: true,
-        shouldZoomOut: false);
+      placeholderColor: room.getColorOfUser(content.senderId),
+      placeholderText: content.roomName,
+      imageProvider: content.senderImage,
+      doCircleMask: true,
+      shouldZoomOut: false,
+    );
 
     var bytes = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
     final data = bytes!.buffer.asUint8List();
 
     var details = LinuxNotificationDetails(
-        icon: ByteDataLinuxIcon(LinuxRawIconData(
-            data: data,
-            width: image.width,
-            height: image.height,
-            hasAlpha: true,
-            channels: 4)),
-        defaultActionName: openRoom,
-        category: LinuxNotificationCategory.imReceived,
-        timeout: const LinuxNotificationTimeout.expiresNever(),
-        urgency: LinuxNotificationUrgency.critical,
-        actions: [
-          LinuxNotificationAction(
-              key: callAccept, label: CommonStrings.promptAccept),
-          LinuxNotificationAction(
-              key: callDecline, label: CommonStrings.promptDecline),
-        ]);
+      icon: ByteDataLinuxIcon(
+        LinuxRawIconData(
+          data: data,
+          width: image.width,
+          height: image.height,
+          hasAlpha: true,
+          channels: 4,
+        ),
+      ),
+      defaultActionName: openRoom,
+      category: LinuxNotificationCategory.imReceived,
+      timeout: const LinuxNotificationTimeout.expiresNever(),
+      urgency: LinuxNotificationUrgency.critical,
+      actions: [
+        LinuxNotificationAction(
+          key: callAccept,
+          label: CommonStrings.promptAccept,
+        ),
+        LinuxNotificationAction(
+          key: callDecline,
+          label: CommonStrings.promptDecline,
+        ),
+      ],
+    );
 
     var payload = {
       // include default action here as well
@@ -296,11 +320,16 @@ class LinuxNotifier implements Notifier {
       "default_action_id": openRoom,
       "room_id": content.roomId,
       "client_id": content.clientId,
-      "call_id": content.callId
+      "call_id": content.callId,
     };
 
-    flutterLocalNotificationsPlugin?.show(0, content.title, content.content,
-        notificationDetails: details, payload: jsonEncode(payload));
+    flutterLocalNotificationsPlugin?.show(
+      0,
+      content.title,
+      content.content,
+      notificationDetails: details,
+      payload: jsonEncode(payload),
+    );
   }
 
   Future<ui.Image> determineImage(ImageProvider provider) async {

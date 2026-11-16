@@ -21,15 +21,18 @@ class _BenchmarkTimelineViewerState extends State<BenchmarkTimelineViewer> {
 
   @override
   void initState() {
+    super.initState();
     MatrixClient.create("benchmark").then((client) {
+      if (!mounted) return;
       client.mockComponents();
       client.self = MatrixProfile(client,
-          matrix.Profile(userId: '@benchy:matrix.org', displayName: 'benchy'));
+          matrix.Profile(userId: benchmarkUserId, displayName: 'benchy'));
 
       var room = client.createRoomWithData();
-      timeline = room.getBenchmarkTimeline();
+      setState(() {
+        timeline = room.getBenchmarkTimeline();
+      });
     });
-    super.initState();
   }
 
   @override

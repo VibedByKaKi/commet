@@ -36,10 +36,11 @@ class LoginPageState extends State<LoginPage> {
       );
 
   String get messageInvalidUsernameOrPassword => Intl.message(
-      "Invalid username or password",
-      name: "messageInvalidUsernameOrPassword",
-      desc:
-          "An error message displayed when the user attempts to log into an account using the wrong username/password combination");
+        "Invalid username or password",
+        name: "messageInvalidUsernameOrPassword",
+        desc:
+            "An error message displayed when the user attempts to log into an account using the wrong username/password combination",
+      );
 
   StreamSubscription? progressSubscription;
   double? progress;
@@ -128,8 +129,9 @@ class LoginPageState extends State<LoginPage> {
     if (result is LoginResultSuccess) {
       final mxid = loginClient!.self?.identifier;
       final alreadyLoggedIn = mxid != null &&
-          (clientManager?.clients
-                  .any((client) => client.self?.identifier == mxid) ??
+          (clientManager?.clients.any(
+                (client) => client.self?.identifier == mxid,
+              ) ??
               false);
       if (alreadyLoggedIn) {
         result = LoginResultAlreadyLoggedIn();
@@ -213,4 +215,3 @@ class LoginPageState extends State<LoginPage> {
     return isLocal ? Uri.http(trimmed) : Uri.https(trimmed);
   }
 }
-

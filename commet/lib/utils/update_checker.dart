@@ -18,12 +18,18 @@ import 'package:http/http.dart' as http;
 class UpdateChecker {
   static bool foundUpdate = false;
 
+  static const _latestReleaseApi =
+      "https://api.github.com/repos/VibedByKaKi/commet/releases/tags/latest";
+
+  static const _latestReleasePage =
+      "https://github.com/VibedByKaKi/commet/releases/tag/latest";
+
   static String get labelUpdateAvailable => Intl.message("Update Available",
       name: "labelUpdateAvailable",
       desc: "Label for the the info popup when an update is available");
 
   static String descriptionUpdateAvailable(String version) => Intl.message(
-      "There is a newer version of Commet available: ${version}",
+      "There is a newer version of Halley available: ${version}",
       name: "descriptionUpdateAvailable",
       args: [version],
       desc:
@@ -40,42 +46,44 @@ class UpdateChecker {
       return;
     }
 
-    const key = "chat.commet.published_version";
-
-    var url = Uri.parse(
-        "https://data.commet.chat/_matrix/federation/v1/query/profile?user_id=@updates:data.commet.chat");
-
-    var response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      foundUpdate = true;
-    }
+    final response = await http.get(Uri.parse(_latestReleaseApi), headers: {
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    });
 
     Log.i("Got update data: ${response.body}");
 
-    var fields = jsonDecode(response.body) as Map<String, dynamic>;
-
-    if (fields.containsKey(key)) {
-      var date = fields["chat.commet.build_date_ms"];
-
-      var val = int.parse(date);
-      var time = DateTime.fromMillisecondsSinceEpoch(val);
-
-      var canAutoUpdate = fields["chat.commet.auto_update"] == "true";
-      Log.i("Supports auto update: $canAutoUpdate");
-      if (time.isAfter(BuildConfig.BUILD_DATE)) {
-        var tag = fields[key];
-        clientManager!.alertManager.addAlert(Alert(AlertType.info,
-            messageGetter: () => descriptionUpdateAvailable(tag),
-            titleGetter: () => labelUpdateAvailable,
-            action: (context) => doUpdateAction(context, canAutoUpdate)));
-      } else {
-        Log.i(
-            "Found an update, but it's build date is not after the current build, current: ${BuildConfig.BUILD_DATE.toString()} remote: ${time.toString()}");
-      }
-
+    if (response.statusCode != 200) {
+      Log.w("Update check failed with status ${response.statusCode}");
       return;
     }
+
+    final fields = jsonDecode(response.body) as Map<String, dynamic>;
+    final publishedAt = fields["published_at"] as String?;
+    if (publishedAt == null) return;
+
+    final remoteTime = DateTime.parse(publishedAt).toUtc();
+    final localTime = BuildConfig.BUILD_DATE.toUtc();
+
+    if (!remoteTime.isAfter(localTime)) {
+      Log.i(
+          "Found latest release, but it's not newer than this build. current: $localTime remote: $remoteTime");
+      return;
+    }
+
+    foundUpdate = true;
+    final tag = (fields["name"] as String?)?.trim().isNotEmpty == true
+        ? fields["name"] as String
+        : (fields["tag_name"] as String? ?? "latest");
+
+    final htmlUrl = fields["html_url"] as String? ?? _latestReleasePage;
+    final canAutoUpdate = false;
+
+    clientManager!.alertManager.addAlert(Alert(AlertType.info,
+        messageGetter: () => descriptionUpdateAvailable(tag),
+        titleGetter: () => labelUpdateAvailable,
+        action: (context) =>
+            doUpdateAction(context, canAutoUpdate, releaseUrl: htmlUrl)));
   }
 
   static bool get shouldCheckForUpdates {
@@ -90,25 +98,18 @@ class UpdateChecker {
     return true;
   }
 
-  static doUpdateAction(BuildContext context, bool canAutoUpdate) async {
+  static doUpdateAction(BuildContext context, bool canAutoUpdate,
+      {String releaseUrl = _latestReleasePage}) async {
     if (PlatformUtils.isWindows) {
-      windowsUpdateAction(context, canAutoUpdate);
+      windowsUpdateAction(context, canAutoUpdate, releaseUrl: releaseUrl);
+      return;
     }
 
-    if (PlatformUtils.isAndroid) {
-      LinkUtils.open(
-        Uri.parse("https://commet.chat/install/android/"),
-        context: context,
-      );
-    }
-
-    if (PlatformUtils.isLinux) {
-      LinkUtils.open(Uri.parse("https://commet.chat/install/linux/"),
-          context: context);
-    }
+    LinkUtils.open(Uri.parse(releaseUrl), context: context);
   }
 
-  static windowsUpdateAction(BuildContext context, bool canAutoUpdate) async {
+  static windowsUpdateAction(BuildContext context, bool canAutoUpdate,
+      {String releaseUrl = _latestReleasePage}) async {
     var exe = Platform.resolvedExecutable;
 
     var installPath = path.dirname(exe);
@@ -148,7 +149,6 @@ class UpdateChecker {
       if (confirmation == null) return;
     }
 
-    LinkUtils.open(Uri.parse("https://commet.chat/install/windows/"),
-        context: context);
+    LinkUtils.open(Uri.parse(releaseUrl), context: context);
   }
 }

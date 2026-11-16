@@ -405,14 +405,17 @@ class Preferences {
   BoolPreference showRoomsInSidebar =
       BoolPreference("show_rooms_in_sidebar", defaultValue: false);
 
+  BoolPreference showRoomsInHomeSidebar =
+      BoolPreference("show_rooms_in_home_sidebar", defaultValue: true);
+
   BoolPreference hideRecentActivityFromHome =
       BoolPreference("hide_recent_activity_from_home", defaultValue: false);
 
   BoolPreference hideRoomsFromHome =
-      BoolPreference("hide_rooms_from_home", defaultValue: false);
+      BoolPreference("hide_rooms_from_home", defaultValue: true);
 
   BoolPreference usePlaceholderRoomAvatars =
-      BoolPreference("use_placeholder_room_avatars", defaultValue: false);
+      BoolPreference("use_placeholder_room_avatars", defaultValue: true);
 
   BoolPreference previewMediaInPublicRooms =
       BoolPreference("preview_media_in_public_rooms", defaultValue: false);

@@ -360,44 +360,67 @@ class _ImageButtonState extends State<ImageButton> {
     );
   }
 
+  Widget? createPlaceholder() {
+    if (widget.icon != null) {
+      return Container(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        child: Icon(
+          color: Theme.of(context).colorScheme.secondary,
+          widget.icon,
+          size: widget.iconSize ?? widget.size / 2.5,
+        ),
+      );
+    }
+
+    final text = widget.placeholderText;
+    if (text != null && text.isNotEmpty) {
+      return Container(
+        // Fall back to a visible surface when the space/room color is null,
+        // otherwise the letter sits on a transparent dark hole.
+        color: widget.placeholderColor ??
+            Theme.of(context).colorScheme.primaryContainer,
+        alignment: Alignment.center,
+        child: Text(
+          text.characters.first.toUpperCase(),
+          style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                fontSize: widget.size / 4,
+                color: widget.placeholderColor == null
+                    ? Theme.of(context).colorScheme.onPrimaryContainer
+                    : null,
+              ),
+        ),
+      );
+    }
+
+    return null;
+  }
+
   InkWell createInkwell() {
+    final placeholder = createPlaceholder();
+    // Always paint the letter/color under the image. FadeInImage uses a
+    // transparent loading frame, and Matrix LOD avatars can fail without
+    // reporting an error — without this stack the icon stays an empty hole.
     return InkWell(
         onTap: widget.onTap,
         child: widget.image != null
             ? Ink(
-                child: FadeInImage(
-                  placeholder: transparentImage.image,
-                  fadeInDuration: Durations.short2,
-                  filterQuality: FilterQuality.medium,
-                  image: widget.image!,
-                  fit: BoxFit.cover,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (placeholder != null) placeholder,
+                    FadeInImage(
+                      placeholder: transparentImage.image,
+                      fadeInDuration: Durations.short2,
+                      filterQuality: FilterQuality.medium,
+                      image: widget.image!,
+                      fit: BoxFit.cover,
+                      imageErrorBuilder: (context, error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
                 ),
               )
-            : widget.icon != null
-                ? Container(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    child: Icon(
-                      color: Theme.of(context).colorScheme.secondary,
-                      widget.icon,
-                      size: widget.iconSize ?? widget.size / 2.5,
-                    ),
-                  )
-                : widget.placeholderText != null
-                    ? Container(
-                        color: widget.placeholderColor,
-                        child: Align(
-                            alignment: Alignment.center,
-                            child: widget.placeholderText != null
-                                ? Text(
-                                    widget.placeholderText!
-                                        .substring(0, 1)
-                                        .toUpperCase(),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall!
-                                        .copyWith(fontSize: widget.size / 4),
-                                  )
-                                : null))
-                    : null);
+            : placeholder);
   }
 }

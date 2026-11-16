@@ -178,17 +178,12 @@ class _RoomTextButtonState extends State<RoomTextButton> {
 
     String displayName = widget.room.displayName;
 
+    // Always supply letter/color under an Avatar so failed MXC loads do not
+    // leave an empty hole (RoomPanel / space homepage already do this).
     Color? avatarPlaceholderColor =
-        (showRoomIcons && useGenericIcons && widget.room.avatar == null) ||
-                (!showRoomIcons && useGenericIcons)
-            ? widget.room.defaultColor
-            : null;
-
+        shouldShowDefaultIcon ? null : widget.room.defaultColor;
     String? avatarPlaceholderText =
-        (showRoomIcons && useGenericIcons && widget.room.avatar == null) ||
-                (!showRoomIcons && useGenericIcons)
-            ? widget.room.displayName
-            : null;
+        shouldShowDefaultIcon ? null : widget.room.displayName;
 
     bool startsWithEmoji =
         TextUtils.isEmoji(widget.room.displayName.characters.first);

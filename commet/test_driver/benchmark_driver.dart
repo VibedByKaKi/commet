@@ -31,6 +31,12 @@ Future<void> main() {
                 List<Map<String, dynamic>>.from(data[key]["extra_values"]));
           }
 
+          // Skip frame timing metrics when the traced interaction produced no
+          // timeline events (TimelineSummary throws on an empty summary).
+          if (timeline.events == null || timeline.events!.isEmpty) {
+            continue;
+          }
+
           result.addAll([
             {
               "name": "$key - Average Build Time",
