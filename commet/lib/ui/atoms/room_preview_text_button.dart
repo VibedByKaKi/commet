@@ -36,15 +36,17 @@ class _RoomPreviewTextButtonState extends State<RoomPreviewTextButton> {
 
     String displayName = widget.room.displayName;
 
+    final bool showingAvatarImage = showRoomIcons && widget.room.avatar != null;
+    final bool showingLetterPlaceholder =
+        useGenericIcons && (!showRoomIcons || widget.room.avatar == null);
+
+    // Letter/color under Avatar for load failures, and for placeholder mode.
     Color? avatarPlaceholderColor =
-        (showRoomIcons && useGenericIcons && widget.room.avatar == null) ||
-                (!showRoomIcons && useGenericIcons)
+        (showingAvatarImage || showingLetterPlaceholder)
             ? widget.room.color
             : null;
-
     String? avatarPlaceholderText =
-        (showRoomIcons && useGenericIcons && widget.room.avatar == null) ||
-                (!showRoomIcons && useGenericIcons)
+        (showingAvatarImage || showingLetterPlaceholder)
             ? widget.room.displayName
             : null;
 

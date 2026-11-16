@@ -109,21 +109,15 @@ class _RoomHeaderState extends State<RoomHeader> {
       );
     } else {
       iconPadding = EdgeInsets.fromLTRB(4, 0, 8, 0);
+      // Always pass letter/color so a failed avatar load still shows a
+      // placeholder (same as RoomPanel on the space homepage).
       iconWidget = tiamat.Avatar(
         radius: 15,
         image: showRoomIcons && widget.room.avatar != null
             ? widget.room.avatar
             : null,
-        placeholderText:
-            (showRoomIcons && useGenericIcons && widget.room.avatar == null) ||
-                    (!showRoomIcons && useGenericIcons)
-                ? widget.room.displayName
-                : "",
-        placeholderColor:
-            (showRoomIcons && useGenericIcons && widget.room.avatar == null) ||
-                    (!showRoomIcons && useGenericIcons)
-                ? widget.room.defaultColor
-                : m.Colors.grey,
+        placeholderText: widget.room.displayName,
+        placeholderColor: widget.room.defaultColor,
       );
     }
     return HeaderView(
