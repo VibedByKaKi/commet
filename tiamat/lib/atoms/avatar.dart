@@ -119,8 +119,7 @@ class Avatar extends StatelessWidget {
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.medium,
                 imageErrorBuilder: (context, error, stackTrace) {
-                  return createPlaceholder(context) ??
-                      const SizedBox.shrink();
+                  return createPlaceholder(context) ?? const SizedBox.shrink();
                 },
               ),
             )),

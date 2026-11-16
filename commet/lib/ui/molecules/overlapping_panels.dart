@@ -100,8 +100,7 @@ class OverlappingPanelsState extends State<OverlappingPanels>
 
     switch (currentSide) {
       case RevealSide.main:
-        final openLeft =
-            translate > openDistance || (flung && flingTowardLeft);
+        final openLeft = translate > openDistance || (flung && flingTowardLeft);
         final openRight =
             translate < -openDistance || (flung && !flingTowardLeft);
         if (openLeft && widget.left != null) {
@@ -221,8 +220,7 @@ class OverlappingPanelsState extends State<OverlappingPanels>
           onTranslate(details.delta.dx);
         },
         onHorizontalDragEnd: (details) {
-          _onApplyTranslation(
-              velocity: details.primaryVelocity ?? 0);
+          _onApplyTranslation(velocity: details.primaryVelocity ?? 0);
         },
         child: Stack(
           children: [
