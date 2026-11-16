@@ -375,14 +375,19 @@ class _ImageButtonState extends State<ImageButton> {
     final text = widget.placeholderText;
     if (text != null && text.isNotEmpty) {
       return Container(
-        color: widget.placeholderColor,
+        // Fall back to a visible surface when the space/room color is null,
+        // otherwise the letter sits on a transparent dark hole.
+        color: widget.placeholderColor ??
+            Theme.of(context).colorScheme.primaryContainer,
         alignment: Alignment.center,
         child: Text(
           text.characters.first.toUpperCase(),
-          style: Theme.of(context)
-              .textTheme
-              .headlineSmall!
-              .copyWith(fontSize: widget.size / 4),
+          style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                fontSize: widget.size / 4,
+                color: widget.placeholderColor == null
+                    ? Theme.of(context).colorScheme.onPrimaryContainer
+                    : null,
+              ),
         ),
       );
     }
@@ -391,21 +396,31 @@ class _ImageButtonState extends State<ImageButton> {
   }
 
   InkWell createInkwell() {
+    final placeholder = createPlaceholder();
+    // Always paint the letter/color under the image. FadeInImage uses a
+    // transparent loading frame, and Matrix LOD avatars can fail without
+    // reporting an error — without this stack the icon stays an empty hole.
     return InkWell(
         onTap: widget.onTap,
         child: widget.image != null
             ? Ink(
-                child: FadeInImage(
-                  placeholder: transparentImage.image,
-                  fadeInDuration: Durations.short2,
-                  filterQuality: FilterQuality.medium,
-                  image: widget.image!,
-                  fit: BoxFit.cover,
-                  imageErrorBuilder: (context, error, stackTrace) {
-                    return createPlaceholder() ?? const SizedBox.shrink();
-                  },
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (placeholder != null) placeholder,
+                    FadeInImage(
+                      placeholder: transparentImage.image,
+                      fadeInDuration: Durations.short2,
+                      filterQuality: FilterQuality.medium,
+                      image: widget.image!,
+                      fit: BoxFit.cover,
+                      imageErrorBuilder: (context, error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ],
                 ),
               )
-            : createPlaceholder());
+            : placeholder);
   }
 }

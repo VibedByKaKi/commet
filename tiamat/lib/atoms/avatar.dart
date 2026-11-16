@@ -101,6 +101,8 @@ class Avatar extends StatelessWidget {
       );
     }
 
+    final placeholder = createPlaceholder(context);
+
     if (image != null) {
       return SizedBox(
         width: radius * 2,
@@ -112,15 +114,21 @@ class Avatar extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(radius / 1.25),
-              child: FadeInImage(
-                placeholder: transparentImage.image,
-                fadeInDuration: Durations.short2,
-                image: image!,
-                fit: BoxFit.cover,
-                filterQuality: FilterQuality.medium,
-                imageErrorBuilder: (context, error, stackTrace) {
-                  return createPlaceholder(context) ?? const SizedBox.shrink();
-                },
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (placeholder != null) placeholder,
+                  FadeInImage(
+                    placeholder: transparentImage.image,
+                    fadeInDuration: Durations.short2,
+                    image: image!,
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.medium,
+                    imageErrorBuilder: (context, error, stackTrace) {
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                ],
               ),
             )),
       );
@@ -129,7 +137,7 @@ class Avatar extends StatelessWidget {
     return SizedBox(
       width: radius * 2,
       height: radius * 2,
-      child: createPlaceholder(context),
+      child: placeholder,
     );
   }
 
@@ -141,17 +149,20 @@ class Avatar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(radius / 1.25),
-          color: placeholderColor ?? Colors.transparent,
+          color: placeholderColor ??
+              Theme.of(context).colorScheme.primaryContainer,
           border: border),
       child: Align(
           alignment: Alignment.center,
           child: placeholderText!.isNotEmpty
               ? Text(
                   placeholderText!.characters.first.toUpperCase(),
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall!
-                      .copyWith(fontSize: radius),
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                        fontSize: radius,
+                        color: placeholderColor == null
+                            ? Theme.of(context).colorScheme.onPrimaryContainer
+                            : null,
+                      ),
                 )
               : null),
     );
