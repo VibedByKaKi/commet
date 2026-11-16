@@ -36,7 +36,15 @@ class OverlappingPanels extends StatefulWidget {
 
   final Function? onDragStart;
 
-  final double threshold = 0.2;
+  /// Fraction of screen width to open a side panel from main. Lower = easier.
+  final double openThreshold = 0.08;
+
+  /// Fraction of screen width to drag back before closing a side panel.
+  final double closeThreshold = 0.2;
+
+  /// Horizontal fling speed (px/s) that commits a reveal/close even if the
+  /// drag distance is below the distance threshold.
+  final double flingVelocity = 400;
 
   const OverlappingPanels(
       {this.left,
@@ -67,7 +75,7 @@ class OverlappingPanelsState extends State<OverlappingPanels>
     return (multiplier * width) + (-multiplier * widget.restWidth);
   }
 
-  void _onApplyTranslation() {
+  void _onApplyTranslation({double velocity = 0}) {
     final mediaWidth =
         MediaQuery.of(context).size.width / preferences.appScale.value;
     final animationController = AnimationController(
@@ -84,34 +92,46 @@ class OverlappingPanelsState extends State<OverlappingPanels>
       }
     });
 
-    var percent = -translate / mediaWidth;
-    bool crossedThreshold = percent.abs() > widget.threshold &&
-        percent.abs() < 1 - widget.threshold;
+    final flung = velocity.abs() >= widget.flingVelocity;
+    // Positive velocity = swipe right → reveal left; negative → reveal right.
+    final flingTowardLeft = velocity > 0;
+    final openDistance = mediaWidth * widget.openThreshold;
+    final closeDistance = mediaWidth * widget.closeThreshold;
 
-    if (crossedThreshold) {
-      switch (currentSide) {
-        case RevealSide.left:
-        case RevealSide.right:
-          revealMainPanel(animationController);
-          break;
-        case RevealSide.main:
-          (percent < 0)
-              ? revealLeftPanel(mediaWidth, animationController)
-              : revealRightPanel(mediaWidth, animationController);
-          break;
-      }
-    } else {
-      switch (currentSide) {
-        case RevealSide.left:
+    switch (currentSide) {
+      case RevealSide.main:
+        final openLeft =
+            translate > openDistance || (flung && flingTowardLeft);
+        final openRight =
+            translate < -openDistance || (flung && !flingTowardLeft);
+        if (openLeft && widget.left != null) {
           revealLeftPanel(mediaWidth, animationController);
-          break;
-        case RevealSide.right:
+        } else if (openRight && widget.right != null) {
           revealRightPanel(mediaWidth, animationController);
-          break;
-        case RevealSide.main:
+        } else {
           revealMainPanel(animationController);
-          break;
-      }
+        }
+        break;
+      case RevealSide.left:
+        final goal = _calculateGoal(mediaWidth, 1);
+        final draggedBack = translate < goal - closeDistance;
+        final flingClosed = flung && !flingTowardLeft;
+        if (draggedBack || flingClosed) {
+          revealMainPanel(animationController);
+        } else {
+          revealLeftPanel(mediaWidth, animationController);
+        }
+        break;
+      case RevealSide.right:
+        final goal = _calculateGoal(mediaWidth, -1);
+        final draggedBack = translate > goal + closeDistance;
+        final flingClosed = flung && flingTowardLeft;
+        if (draggedBack || flingClosed) {
+          revealMainPanel(animationController);
+        } else {
+          revealRightPanel(mediaWidth, animationController);
+        }
+        break;
     }
 
     animationController.forward();
@@ -201,7 +221,8 @@ class OverlappingPanelsState extends State<OverlappingPanels>
           onTranslate(details.delta.dx);
         },
         onHorizontalDragEnd: (details) {
-          _onApplyTranslation();
+          _onApplyTranslation(
+              velocity: details.primaryVelocity ?? 0);
         },
         child: Stack(
           children: [

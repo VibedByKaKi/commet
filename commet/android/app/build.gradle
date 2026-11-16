@@ -82,15 +82,29 @@ android {
         }
         release {
             signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
-
-    packagingOptions {
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
+    // abiFilters alone does not strip plugin-shipped .so files; exclude them
+    // from the APK explicitly. Compress JNI so arm64 libs don't land STORE'd.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+            excludes += [
+                "lib/armeabi/**",
+                "lib/armeabi-v7a/**",
+                "lib/x86/**",
+                "lib/x86_64/**",
+            ]
+        }
+        resources {
+            pickFirsts += [
+                'lib/arm64-v8a/libc++_shared.so',
+            ]
+        }
     }
 }
 
@@ -102,4 +116,34 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.compose.ui:ui-unit:1.11.2'
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+}
+
+// Belt-and-suspenders: some Flutter plugins still merge foreign ABIs past
+// packaging.jniLibs.excludes. Drop them from the merged native-libs folder.
+tasks.configureEach { task ->
+    if (task.name.startsWith("merge") && task.name.endsWith("NativeLibs")) {
+        task.doLast {
+            def roots = [] as Set
+            task.outputs.files.each { f ->
+                if (f.directory) roots << f
+            }
+            try {
+                def prop = task.hasProperty("outputDir") ? task.outputDir : null
+                if (prop != null) {
+                    roots << (prop.respondsTo("get") ? prop.get().asFile : prop)
+                }
+            } catch (Exception ignored) {
+                // outputDir shape varies across AGP versions
+            }
+            ["armeabi", "armeabi-v7a", "x86", "x86_64"].each { abi ->
+                roots.each { root ->
+                    def dir = new File(root as File, abi)
+                    if (dir.exists()) {
+                        logger.lifecycle("Stripping non-arm64 JNI: ${dir}")
+                        delete dir
+                    }
+                }
+            }
+        }
+    }
 }

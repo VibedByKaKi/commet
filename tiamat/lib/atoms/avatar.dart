@@ -118,6 +118,10 @@ class Avatar extends StatelessWidget {
                 image: image!,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.medium,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return createPlaceholder(context) ??
+                      const SizedBox.shrink();
+                },
               ),
             )),
       );
@@ -126,25 +130,31 @@ class Avatar extends StatelessWidget {
     return SizedBox(
       width: radius * 2,
       height: radius * 2,
-      child: placeholderText != null
-          ? DecoratedBox(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(radius / 1.25),
-                  color: placeholderColor ?? Colors.transparent,
-                  border: border),
-              child: Align(
-                  alignment: Alignment.center,
-                  child: placeholderText != null && placeholderText!.isNotEmpty
-                      ? Text(
-                          placeholderText!.characters.first.toUpperCase(),
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall!
-                              .copyWith(fontSize: radius),
-                        )
-                      : null),
-            )
-          : null,
+      child: createPlaceholder(context),
+    );
+  }
+
+  Widget? createPlaceholder(BuildContext context) {
+    if (placeholderText == null) {
+      return null;
+    }
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(radius / 1.25),
+          color: placeholderColor ?? Colors.transparent,
+          border: border),
+      child: Align(
+          alignment: Alignment.center,
+          child: placeholderText!.isNotEmpty
+              ? Text(
+                  placeholderText!.characters.first.toUpperCase(),
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall!
+                      .copyWith(fontSize: radius),
+                )
+              : null),
     );
   }
 }

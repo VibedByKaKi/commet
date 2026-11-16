@@ -241,10 +241,9 @@ flutter:
     - family: Jellee
       fonts: 
         - asset: assets/font/jellee/Jellee-Bold.ttf
-        
-    - family: EmojiFont
-      fonts: 
-        - asset: assets/font/emoji-font/TwemojiCOLR.otf
+
+    # EmojiFont ships from tiamat (Twemoji COLR) — do not redeclare here or
+    # Flutter bundles a second copy of the font.
 
     - family: RobotoCustom
       fonts: 

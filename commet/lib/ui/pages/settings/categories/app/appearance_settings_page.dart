@@ -109,40 +109,41 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           "Description for the toggle which shows an extra entry for rooms which are not contained in a space in the sidebar");
 
   String get labelShowRoomsInHomeSidebar => Intl.message(
-      "Show rooms in Home sidebar",
+      "Show rooms in Home column",
       name: "labelShowRoomsInHomeSidebar",
       desc:
-          "Label for showing non-space rooms in the Home secondary sidebar under Direct messages");
+          "Label for showing non-space rooms in the Home column under Direct messages");
 
   String get labelShowRoomsInHomeSidebarDescription => Intl.message(
-      "List rooms which are not contained in a space below Direct messages in the Home sidebar, with the same preview as DMs",
+      "List rooms which are not contained in a space below Direct messages in the Home column, with the same preview as DMs",
       name: "labelShowRoomsInHomeSidebarDescription",
       desc:
-          "Description for showing non-space rooms in the Home secondary sidebar under Direct messages");
+          "Description for showing non-space rooms in the Home column under Direct messages");
 
   String get labelHideRecentActivityFromHome => Intl.message(
-        "Hide recent activity from Home",
+        "Hide recent activity from Home main view",
         name: "labelHideRecentActivityFromHome",
-        desc: "Label for hiding the recent activity panel on the Home screen",
+        desc:
+            "Label for hiding the recent activity panel on the Home main view",
       );
 
   String get labelHideRecentActivityFromHomeDescription => Intl.message(
-        "Remove the recent activity list from the Home screen",
+        "Remove the recent activity list from the Home main view",
         name: "labelHideRecentActivityFromHomeDescription",
         desc:
-            "Description for hiding the recent activity panel on the Home screen",
+            "Description for hiding the recent activity panel on the Home main view",
       );
 
   String get labelHideRoomsFromHome => Intl.message(
-        "Hide rooms from home",
+        "Hide rooms from Home main view",
         name: "labelHideRoomsFromHome",
-        desc: "Label for hiding the rooms list on the Home screen",
+        desc: "Label for hiding the rooms list on the Home main view",
       );
 
   String get labelHideRoomsFromHomeDescription => Intl.message(
-        "Remove the rooms list from the Home screen",
+        "Remove the rooms list from the Home main view",
         name: "labelHideRoomsFromHomeDescription",
-        desc: "Description for hiding the rooms list on the Home screen",
+        desc: "Description for hiding the rooms list on the Home main view",
       );
 
   @override
@@ -242,12 +243,6 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             child: Column(
               children: [
                 BooleanPreferenceToggle(
-                  preference: preferences.showRoomsInHomeSidebar,
-                  title: labelShowRoomsInHomeSidebar,
-                  description: labelShowRoomsInHomeSidebarDescription,
-                ),
-                const Seperator(),
-                BooleanPreferenceToggle(
                   preference: preferences.hideRecentActivityFromHome,
                   title: labelHideRecentActivityFromHome,
                   description: labelHideRecentActivityFromHomeDescription,
@@ -257,6 +252,12 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                   preference: preferences.hideRoomsFromHome,
                   title: labelHideRoomsFromHome,
                   description: labelHideRoomsFromHomeDescription,
+                ),
+                const Seperator(),
+                BooleanPreferenceToggle(
+                  preference: preferences.showRoomsInHomeSidebar,
+                  title: labelShowRoomsInHomeSidebar,
+                  description: labelShowRoomsInHomeSidebarDescription,
                 ),
               ],
             ),

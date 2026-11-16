@@ -360,6 +360,36 @@ class _ImageButtonState extends State<ImageButton> {
     );
   }
 
+  Widget? createPlaceholder() {
+    if (widget.icon != null) {
+      return Container(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        child: Icon(
+          color: Theme.of(context).colorScheme.secondary,
+          widget.icon,
+          size: widget.iconSize ?? widget.size / 2.5,
+        ),
+      );
+    }
+
+    final text = widget.placeholderText;
+    if (text != null && text.isNotEmpty) {
+      return Container(
+        color: widget.placeholderColor,
+        alignment: Alignment.center,
+        child: Text(
+          text.characters.first.toUpperCase(),
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall!
+              .copyWith(fontSize: widget.size / 4),
+        ),
+      );
+    }
+
+    return null;
+  }
+
   InkWell createInkwell() {
     return InkWell(
         onTap: widget.onTap,
@@ -371,33 +401,11 @@ class _ImageButtonState extends State<ImageButton> {
                   filterQuality: FilterQuality.medium,
                   image: widget.image!,
                   fit: BoxFit.cover,
+                  imageErrorBuilder: (context, error, stackTrace) {
+                    return createPlaceholder() ?? const SizedBox.shrink();
+                  },
                 ),
               )
-            : widget.icon != null
-                ? Container(
-                    color: Theme.of(context).colorScheme.surfaceContainerLow,
-                    child: Icon(
-                      color: Theme.of(context).colorScheme.secondary,
-                      widget.icon,
-                      size: widget.iconSize ?? widget.size / 2.5,
-                    ),
-                  )
-                : widget.placeholderText != null
-                    ? Container(
-                        color: widget.placeholderColor,
-                        child: Align(
-                            alignment: Alignment.center,
-                            child: widget.placeholderText != null
-                                ? Text(
-                                    widget.placeholderText!
-                                        .substring(0, 1)
-                                        .toUpperCase(),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall!
-                                        .copyWith(fontSize: widget.size / 4),
-                                  )
-                                : null))
-                    : null);
+            : createPlaceholder());
   }
 }
