@@ -1,6 +1,6 @@
-# VibedByKaKi/commet
+# Halley
 
-Matrix client for Android, Linux, Windows, and macOS. Fork of [Commet](https://github.com/commetchat/commet).
+Halley is a (fork of) [Commet](https://github.com/commetchat/commet) : Matrix client for Android, Linux, Windows, and macOS.
 
 The upstream project README stays in [README.md](../README.md) at the repository root.
 
