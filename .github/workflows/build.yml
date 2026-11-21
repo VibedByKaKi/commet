@@ -488,11 +488,21 @@ jobs:
           grep -q 'libmpv.so.2 => .*/bundle/lib/libmpv.so.2' /tmp/commet-ldd.txt \
             || (echo "libmpv was not resolved from the bundle lib dir" >&2; exit 1)
 
+      # Zip + archive:false matches Android/macOS so the Actions Artifacts
+      # list shows a single downloadable file (directory uploads often do not).
+      - name: Package Linux bundle
+        run: |
+          set -euo pipefail
+          DEST="commet-linux-${{ steps.meta.outputs.version }}.zip"
+          (cd "$PROJECT_PATH/build/linux/x64/release" && zip -qr "$GITHUB_WORKSPACE/$DEST" bundle)
+          echo "zip_filename=${DEST}" >> "$GITHUB_OUTPUT"
+        id: package
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: commet-linux-${{ steps.meta.outputs.version }}
-          path: commet/build/linux/x64/release/bundle
+          path: ${{ steps.package.outputs.zip_filename }}
+          archive: false
           retention-days: 90
 
   build-web:
