@@ -276,8 +276,6 @@ jobs:
     if: github.ref != 'refs/heads/dev'
     needs: codegen
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       # Free disk without wiping hostedtoolcache (that forces a full Flutter reinstall).
       # Skip docker prune — runners rarely have useful images here and it costs ~20–40s.
@@ -390,21 +388,12 @@ jobs:
           archive: false
           retention-days: 90
 
-      - name: Publish latest pre-release
-        if: github.event_name != 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          cp "${{ steps.prepare.outputs.apk_filename }}" Halley.apk
-          gh release delete latest --cleanup-tag --yes || true
-          gh release create latest Halley.apk --target "$GITHUB_SHA" \
-            --prerelease --title "Latest build" \
-            --notes "Signed arm64 APK built from ${GITHUB_SHA}."
-
   build-linux:
     if: github.ref != 'refs/heads/dev'
     needs: codegen
-    runs-on: ubuntu-latest
+    # Pin 24.04: ubuntu-latest (26+) ships GLIBC 2.42+ and the bundled
+    # libmpv/ffmpeg deps then fail on typical desktops still on 2.39.
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -494,6 +483,111 @@ jobs:
           name: commet-linux-${{ steps.meta.outputs.version }}
           path: commet/build/linux/x64/release/bundle
           retention-days: 90
+
+  # Publish whichever platform builds succeeded this run, even if another failed
+  # (e.g. macOS cancelled for lack of runners still leaves Android + Linux on latest).
+  publish-latest:
+    if: |
+      always()
+      && github.event_name != 'pull_request'
+      && github.ref != 'refs/heads/dev'
+      && (
+        needs.build-android.result == 'success'
+        || needs.build-linux.result == 'success'
+        || needs.build-macos.result == 'success'
+      )
+    needs: [build-android, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      # gh release needs a git repo / remote to resolve the target repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download Android artifact
+        if: needs.build-android.result == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: commet-android-*
+          path: artifacts/android
+          merge-multiple: true
+          # archive:false APK — keep the raw file, do not re-wrap/extract.
+          skip-decompress: true
+
+      - name: Download Linux artifact
+        if: needs.build-linux.result == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: commet-linux-*
+          path: artifacts/linux
+          merge-multiple: true
+
+      - name: Download macOS artifact
+        if: needs.build-macos.result == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@v8
+        with:
+          pattern: commet-macos-*
+          path: artifacts/macos
+          merge-multiple: true
+          # archive:false .zip — without this, download-artifact unpacks the app
+          # and the .zip file disappears.
+          skip-decompress: true
+
+      - name: Assemble and publish latest prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          files=()
+          notes="Built from ${GITHUB_SHA}."
+
+          echo "Android tree:"; find artifacts/android -maxdepth 3 -type f 2>/dev/null | head || true
+          echo "Linux tree:"; find artifacts/linux -maxdepth 2 -type f 2>/dev/null | head || true
+          echo "macOS tree:"; find artifacts/macos -maxdepth 3 2>/dev/null | head || true
+
+          apk="$(find artifacts/android -type f -name '*.apk' 2>/dev/null | head -n1 || true)"
+          if [[ -n "${apk}" ]]; then
+            cp "${apk}" dist/Halley.apk
+            files+=(dist/Halley.apk)
+            notes+=$'\n- Android: Halley.apk'
+          fi
+
+          if [[ -f artifacts/linux/commet.bin ]]; then
+            (cd artifacts/linux && zip -qr "$GITHUB_WORKSPACE/dist/Halley-linux.zip" .)
+            files+=(dist/Halley-linux.zip)
+            notes+=$'\n- Linux: Halley-linux.zip'
+          fi
+
+          macos_zip="$(find artifacts/macos -type f -name '*.zip' 2>/dev/null | head -n1 || true)"
+          if [[ -n "${macos_zip}" ]]; then
+            cp "${macos_zip}" dist/Halley-macos.zip
+            files+=(dist/Halley-macos.zip)
+            notes+=$'\n- macOS: Halley-macos.zip'
+          elif [[ -d artifacts/macos/commet.app ]]; then
+            (cd artifacts/macos && zip -qr "$GITHUB_WORKSPACE/dist/Halley-macos.zip" commet.app)
+            files+=(dist/Halley-macos.zip)
+            notes+=$'\n- macOS: Halley-macos.zip'
+          fi
+
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo "No platform artifacts available to publish" >&2
+            exit 1
+          fi
+
+          ls -lah dist/
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest "${files[@]}" --target "$GITHUB_SHA" \
+            --prerelease --title "Latest build" \
+            --notes "${notes}"
 
   build-web:
     if: startsWith(github.ref, 'refs/tags/')

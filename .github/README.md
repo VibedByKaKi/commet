@@ -7,7 +7,11 @@ The upstream project README stays in [README.md](../README.md) at the repository
 | [![](assets/get-it-on-github.png)](https://github.com/VibedByKaKi/commet/releases/tag/latest) | [![](assets/badge_obtainium.png)](https://apps.obtainium.imranr.dev/redirect?r=obtainium%3A%2F%2Fapp%2F%257B%2522id%2522%253A%2522chat.halley.halleyapp%2522%252C%2522url%2522%253A%2522https%253A%252F%252Fgithub.com%252FVibedByKaKi%252Fcommet%2522%252C%2522author%2522%253A%2522VibedByKaKi%2522%252C%2522name%2522%253A%2522Halley%2522%252C%2522preferredApkIndex%2522%253A0%252C%2522additionalSettings%2522%253A%2522%257B%255C%2522includePrereleases%255C%2522%253A%2520true%252C%2520%255C%2522fallbackToOlderReleases%255C%2522%253A%2520true%252C%2520%255C%2522apkFilterRegEx%255C%2522%253A%2520%255C%2522.%252A%255C%255C%255C%255C.apk%2524%255C%2522%252C%2520%255C%2522releaseDateAsVersion%255C%2522%253A%2520true%257D%2522%257D) |
 | --- | --- |
 
-The APK is a rolling GitHub prerelease on the [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) tag. Direct download: [Halley.apk](https://github.com/VibedByKaKi/commet/releases/download/latest/Halley.apk). In Obtainium, keep **Include pre-releases** and **Use release date as version** on if you add the repo by hand, because the tag never changes.
+The rolling [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) prerelease is refreshed from successful CI builds and may include:
+[Halley.apk](https://github.com/VibedByKaKi/commet/releases/download/latest/Halley.apk),
+[Halley-linux.zip](https://github.com/VibedByKaKi/commet/releases/download/latest/Halley-linux.zip),
+and [Halley-macos.zip](https://github.com/VibedByKaKi/commet/releases/download/latest/Halley-macos.zip)
+(whichever platforms succeeded that run). In Obtainium, keep **Include pre-releases** and **Use release date as version** on if you add the repo by hand, because the tag never changes.
 
 Upstream does not accept generative-AI contributions, so changes here stay on this fork.
 
@@ -29,7 +33,7 @@ Feature work branches from `dev` and merges back into `dev`.
 
 ## CI
 
-- **build** — signed Android / Linux / macOS / web artifacts on non-`dev` pushes (path-filtered), tags, and manual dispatch. Successful Android builds replace the [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) prerelease with `Halley.apk`.
+- **build** — signed Android / Linux / macOS / web artifacts on non-`dev` pushes (path-filtered), tags, and manual dispatch. A final `publish-latest` job replaces the [`latest`](https://github.com/VibedByKaKi/commet/releases/tag/latest) prerelease with whichever of `Halley.apk` / `Halley-linux.zip` / `Halley-macos.zip` succeeded that run (other platforms failing does not block publishing).
 - **integration-test** / **static-analysis** / **benchmark** — same push triggers; each uses cancel-in-progress so only the newest SHA keeps running.
 
-Pushes to `dev` do not build. Push a feature branch, tag a commit on `dev`, or use workflow dispatch when you want artifacts / a refreshed `latest` APK.
+Pushes to `dev` do not build. Push a feature branch, tag a commit on `dev`, or use workflow dispatch when you want artifacts / a refreshed `latest` release.
