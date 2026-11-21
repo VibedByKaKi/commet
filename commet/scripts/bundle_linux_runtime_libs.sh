@@ -119,6 +119,7 @@ if [[ -f "$BUNDLE/commet.bin" ]]; then
 fi
 
 mv "$BIN" "$BUNDLE/commet.bin"
+chmod +x "$BUNDLE/commet.bin"
 cat >"$BIN" <<'EOF'
 #!/usr/bin/env bash
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

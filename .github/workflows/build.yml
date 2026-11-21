@@ -472,6 +472,10 @@ jobs:
           bash scripts/bundle_linux_runtime_libs.sh build/linux/x64/release/bundle
           test -f build/linux/x64/release/bundle/lib/libmpv.so.2
           test -f build/linux/x64/release/bundle/lib/libXpresent.so.1
+          chmod +x build/linux/x64/release/bundle/commet \
+            build/linux/x64/release/bundle/commet.bin
+          test -x build/linux/x64/release/bundle/commet
+          test -x build/linux/x64/release/bundle/commet.bin
           LD_LIBRARY_PATH="$PWD/build/linux/x64/release/bundle/lib" \
             ldd build/linux/x64/release/bundle/commet.bin | tee /tmp/commet-ldd.txt
           grep -q 'libmpv.so.2 => .*/bundle/lib/libmpv.so.2' /tmp/commet-ldd.txt \
@@ -562,6 +566,8 @@ jobs:
           fi
 
           if [[ -f artifacts/linux/commet.bin ]]; then
+            # download-artifact does not reliably preserve +x; set before zip.
+            chmod +x artifacts/linux/commet.bin artifacts/linux/commet 2>/dev/null || true
             (cd artifacts/linux && zip -qr "$GITHUB_WORKSPACE/dist/Halley-linux.zip" .)
             files+=(dist/Halley-linux.zip)
             notes+=$'\n- Linux: Halley-linux.zip'
