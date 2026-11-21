@@ -502,6 +502,12 @@ jobs:
       contents: write
       actions: read
     steps:
+      # gh release needs a git repo / remote to resolve the target repository.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Download Android artifact
         if: needs.build-android.result == 'success'
         continue-on-error: true
@@ -510,6 +516,8 @@ jobs:
           pattern: commet-android-*
           path: artifacts/android
           merge-multiple: true
+          # archive:false APK — keep the raw file, do not re-wrap/extract.
+          skip-decompress: true
 
       - name: Download Linux artifact
         if: needs.build-linux.result == 'success'
@@ -528,15 +536,23 @@ jobs:
           pattern: commet-macos-*
           path: artifacts/macos
           merge-multiple: true
+          # archive:false .zip — without this, download-artifact unpacks the app
+          # and the .zip file disappears.
+          skip-decompress: true
 
       - name: Assemble and publish latest prerelease
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           mkdir -p dist
           files=()
           notes="Built from ${GITHUB_SHA}."
+
+          echo "Android tree:"; find artifacts/android -maxdepth 3 -type f 2>/dev/null | head || true
+          echo "Linux tree:"; find artifacts/linux -maxdepth 2 -type f 2>/dev/null | head || true
+          echo "macOS tree:"; find artifacts/macos -maxdepth 3 2>/dev/null | head || true
 
           apk="$(find artifacts/android -type f -name '*.apk' 2>/dev/null | head -n1 || true)"
           if [[ -n "${apk}" ]]; then
@@ -554,6 +570,10 @@ jobs:
           macos_zip="$(find artifacts/macos -type f -name '*.zip' 2>/dev/null | head -n1 || true)"
           if [[ -n "${macos_zip}" ]]; then
             cp "${macos_zip}" dist/Halley-macos.zip
+            files+=(dist/Halley-macos.zip)
+            notes+=$'\n- macOS: Halley-macos.zip'
+          elif [[ -d artifacts/macos/commet.app ]]; then
+            (cd artifacts/macos && zip -qr "$GITHUB_WORKSPACE/dist/Halley-macos.zip" commet.app)
             files+=(dist/Halley-macos.zip)
             notes+=$'\n- macOS: Halley-macos.zip'
           fi
