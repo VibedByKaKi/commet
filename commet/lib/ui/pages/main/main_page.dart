@@ -201,7 +201,7 @@ class MainPageState extends State<MainPage> {
 
     SchedulerBinding.instance.scheduleFrameCallback(onFirstFrame);
 
-    checkDonationFlow();
+    // checkDonationFlow();
   }
 
   void onFirstFrame(Duration timeStamp) async {
@@ -211,24 +211,24 @@ class MainPageState extends State<MainPage> {
         await NavigationUtils.navigateTo(context, SetupPage(menus));
       }
 
-      bool isNewVersion =
-          preferences.lastOpenedVersion.value != BuildConfig.VERSION_TAG;
-
       preferences.lastOpenedVersion.set(BuildConfig.VERSION_TAG);
 
-      if (!kIsWeb && isNewVersion && widget.wasLoggedInAtStartup) {
-        await Future.delayed(Duration(seconds: 2));
+      // bool isNewVersion =
+      //     preferences.lastOpenedVersion.value != BuildConfig.VERSION_TAG;
+      //
+      // if (!kIsWeb && isNewVersion && widget.wasLoggedInAtStartup) {
+      //   await Future.delayed(Duration(seconds: 2));
 
-        await AdaptiveDialog.show(
-          context,
-          title: updateInstalledTitle,
-          builder: (buildContext) {
-            return UpdateInstalledDialog(
-              onDonateTapped: () => SettingsPage.onDonateButtonTapped(context),
-            );
-          },
-        );
-      }
+      //   await AdaptiveDialog.show(
+      //     context,
+      //     title: updateInstalledTitle,
+      //     builder: (buildContext) {
+      //       return UpdateInstalledDialog(
+      //         onDonateTapped: () => SettingsPage.onDonateButtonTapped(context),
+      //       );
+      //     },
+      //   );
+      // }
     }
   }
 
